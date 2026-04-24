@@ -1,0 +1,58 @@
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import Productos from './pages/Productos'
+import Movimientos from './pages/Movimientos'
+import Reportes from './pages/Reportes'
+import Prediccion from './pages/Prediccion'
+import Usuarios from './pages/Usuarios'
+import Layout from './components/Layout'
+
+const ProtectedRoute = ({ children }) => {
+  const { usuario, loading } = useAuth()
+
+  if (loading) {
+    return <div className="loading"><div className="spinner"></div></div>
+  }
+
+  if (!usuario) {
+    return <Navigate to="/login" replace />
+  }
+
+  return children
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="productos" element={<Productos />} />
+            <Route path="movimientos" element={<Movimientos />} />
+            <Route path="reportes" element={<Reportes />} />
+            <Route path="prediccion" element={<Prediccion />} />
+            <Route path="usuarios" element={<Usuarios />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  )
+}
+
+export default App
