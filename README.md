@@ -1,4 +1,5 @@
-# 🏪 InventarioPro v2.0 - React + Vite + Python
+
+# 🏪 InventarioPro v2.0 - React + Vite + Python + Docker
 
 **Reescritura completa del sistema de inventario con:**
 - Frontend: Vite + React (mismo diseño)
@@ -37,31 +38,57 @@ inventario/
 └── docs/                  # Documentación
 ```
 
+
 ## 🚀 Setup Rápido
 
-### 1. Frontend
+### Opción 1: Docker (Recomendado)
+
+```bash
+# 1. Clona el repo
+git clone https://github.com/JuanDavid-dev-lang/inventario.git
+cd inventario
+
+# 2. (Opcional) Coloca inventario_db.sql en la raíz
+
+# 3. Levanta todo
+docker-compose up --build
+```
+
+**Servicios:**
+- Frontend: http://localhost/
+- Backend API: http://localhost:8000/api
+- phpMyAdmin: http://localhost:8081
+- Spark UI: http://localhost:4040
+
+Guía completa: [DOCKER_SETUP.md](DOCKER_SETUP.md)
+
+---
+
+### Opción 2: Manual (desarrollo clásico)
+
+**Frontend**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 2. Backend Api
-```
-Usar PHP existente como API REST
-http://localhost/inventario/api.php
+**Backend**
+```bash
+cd backend
+php -S localhost:8000 -t public/
 ```
 
-### 3. IA Python
+**Python ML**
 ```bash
 cd pyml
 python -m venv venv
-source venv/bin/activate  # o venv\Scripts\activate en Windows
+venv\Scripts\activate  # o source venv/bin/activate
 pip install -r requirements.txt
 python trainer.py
 ```
 
-### 4. Base de datos
+**Base de datos**
 ```
 Iniciar XAMPP
 Importar inventario_db.sql en phpMyAdmin
@@ -95,6 +122,21 @@ El módulo Python entrena con datos históricos y predice:
 - ✅ Registro de movimientos
 - ✅ Alertas automáticas
 - ✅ Reportes
-- ✅ Predicción IA (Gemini + Python)
+- ✅ Predicción IA (Gemini + Python + Spark)
 - ✅ Autenticación JWT
 - ✅ Gestión de usuarios
+- ✅ **Docker Compose** (todo orquestado)
+- ✅ **PySpark** para minería de datos
+- ✅ **Test Suite** (unit + E2E)
+
+---
+
+## 📚 Documentación útil
+
+- [DOCKER_SETUP.md](DOCKER_SETUP.md) → Guía Docker
+- [APACHE_SPARK_EXPLICADO.md](APACHE_SPARK_EXPLICADO.md) → ¿Por qué Spark?
+- [TESTING_GUIDE.md](TESTING_GUIDE.md) → Cómo testear todo
+
+---
+
+**¡Listo para producción y desarrollo moderno!**

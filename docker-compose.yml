@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: inventario-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventario_db
+      MYSQL_USER: inventario
+      MYSQL_PASSWORD: password123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./inventario_db.sql:/docker-entrypoint-initdb.d/inventario_db.sql
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: inventario-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: inventario
+      PMA_PASSWORD: password123
+      PMA_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - inventario-network
+
+  # Backend PHP API
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: inventario-backend
+    environment:
+      DB_HOST: mysql
+      DB_USER: inventario
+      DB_PASSWORD: password123
+      DB_NAME: inventario_db
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Frontend React
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: inventario-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Python ML Service
+  python-ml:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.python
+    container_name: inventario-ml
+    environment:
+      SPARK_LOCAL_IP: 127.0.0.1
+      PYTHONUNBUFFERED: 1
+    ports:
+      - "4040:4040"  # Spark UI
+      - "8888:8888"  # Jupyter
+    volumes:
+      - ./pyml:/app
+      - ./pyml/models:/app/models
+    depends_on:
+      - backend
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import pyspark; print('OK')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+
+networks:
+  inventario-network:
+    driver: bridge

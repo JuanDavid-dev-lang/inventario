@@ -1,0 +1,37 @@
+# Python ML Dockerfile
+# PySpark + Python 3.9
+
+FROM python:3.9-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jre-headless \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements
+COPY pyml/requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy Python code
+COPY pyml/ .
+
+# Set JAVA_HOME for Spark
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Expose Spark UI port
+EXPOSE 4040 8888
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import pyspark; print('OK')" || exit 1
+
+# Default command (can be overridden)
+CMD ["python", "-c", "print('PySpark container ready. Run: python spark_mining/run_spark_mining.py')"]
