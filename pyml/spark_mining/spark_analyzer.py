@@ -3,40 +3,53 @@ Apache Spark Data Analyzer
 Advanced analytics and pattern mining with Spark
 """
 
-import requests
+import mysql.connector
 import pandas as pd
-from pyspark.sql import functions as F
-from pyspark.sql.window import Window
 
 from .spark_config import SparkSessionManager
 
 class SparkDataAnalyzer:
     """Analyzes inventory data using Spark for scalable insights"""
     
-    def __init__(self, api_base_url="http://localhost/api"):
-        self.api_base_url = api_base_url
+    def __init__(self, db_host="localhost", db_user="root", db_password="root", db_name="inventario_db"):
+        self.db_host = db_host
+        self.db_user = db_user
+        self.db_password = db_password
+        self.db_name = db_name
         self.spark_manager = SparkSessionManager()
-        self.spark = self.spark_manager.get_spark()
     
     def fetch_all_data(self):
-        """Fetch movements and products data"""
+        """Fetch movements and products data from MySQL"""
         try:
-            print("📥 Fetching inventory data...")
+            print("📥 Fetching inventory data from MySQL...")
             
-            movements_response = requests.get(
-                f"{self.api_base_url}/movimientos"
-            )
-            products_response = requests.get(
-                f"{self.api_base_url}/productos"
+            connection = mysql.connector.connect(
+                host=self.db_host,
+                user=self.db_user,
+                password=self.db_password,
+                database=self.db_name
             )
             
-            if movements_response.status_code == 200 and products_response.status_code == 200:
-                movements = movements_response.json()
-                products = products_response.json()
-                print(f"✅ Fetched {len(movements)} movements, {len(products)} products")
+            cursor = connection.cursor(dictionary=True)
+            
+            # Fetch movements
+            cursor.execute("SELECT * FROM movimientos;")
+            movements = cursor.fetchall()
+            
+            # Fetch products
+            cursor.execute("SELECT * FROM productos;")
+            products = cursor.fetchall()
+            
+            if movements and products:
+                print(f"✅ Fetched {len(movements)} movements, {len(products)} products from MySQL")
+                cursor.close()
+                connection.close()
                 return movements, products
-            
-            return None, None
+            else:
+                print(f"⚠ Fetched {len(movements) if movements else 0} movements, {len(products) if products else 0} products")
+                cursor.close()
+                connection.close()
+                return movements, products
             
         except Exception as e:
             print(f"❌ Error fetching data: {e}")
@@ -51,71 +64,59 @@ class SparkDataAnalyzer:
             if not movements:
                 return None
             
-            # Create Spark DataFrame
+            # Create DataFrame
             pdf = pd.DataFrame(movements)
             pdf['fecha'] = pd.to_datetime(pdf['fecha'])
-            sdf = self.spark.createDataFrame(pdf)
             
             # Analysis 1: Top selling products
             print("🏆 Top 10 Best Selling Products:")
-            top_products = sdf.groupBy('producto_id').agg(
-                F.sum('cantidad').alias('total_quantity'),
-                F.count('*').alias('transaction_count'),
-                F.avg('cantidad').alias('avg_quantity')
-            ).orderBy(F.desc('total_quantity')).limit(10)
+            top_products = pdf.groupby('producto_id').agg({
+                'cantidad': ['sum', 'count', 'mean']
+            }).reset_index()
+            top_products.columns = ['producto_id', 'total_quantity', 'transaction_count', 'avg_quantity']
+            top_products = top_products.nlargest(10, 'total_quantity')
             
-            top_products.show()
+            for idx, row in top_products.iterrows():
+                print(f"   {int(row['producto_id'])}: {int(row['total_quantity'])} units "
+                      f"({int(row['transaction_count'])} transactions)")
             
-            # Analysis 2: Sales trend by day
-            print("\n📈 Sales Trend (Last 7 Days):")
-            sdf_recent = sdf.filter(
-                F.col('fecha') >= F.date_sub(F.current_date(), 7)
-            )
-            
-            daily_trend = sdf_recent.groupBy(
-                F.to_date('fecha').alias('date')
-            ).agg(
-                F.sum('cantidad').alias('total_sales'),
-                F.count('*').alias('transaction_count')
-            ).orderBy('date')
-            
-            daily_trend.show()
-            
-            # Analysis 3: Product velocity
+            # Analysis 2: Product velocity
             print("\n🚀 Product Velocity (Fast Moving vs Slow):")
-            velocity = sdf.groupBy('producto_id').agg(
-                F.count('*').alias('movements'),
-                F.sum('cantidad').alias('total_quantity')
-            )
+            velocity = pdf.groupby('producto_id').agg({
+                'id': 'count',
+                'cantidad': 'sum'
+            }).reset_index()
+            velocity.columns = ['producto_id', 'movements', 'total_quantity']
             
-            velocity_fast = velocity.filter(F.col('movements') > 10)
-            velocity_slow = velocity.filter(F.col('movements') <= 5)
+            fast_moving = (velocity['movements'] > 10).sum()
+            slow_moving = (velocity['movements'] <= 5).sum()
             
-            print(f"Fast Moving Products (>10 movements): {velocity_fast.count()}")
-            print(f"Slow Moving Products (≤5 movements): {velocity_slow.count()}")
+            print(f"   Fast Moving Products (>10 movements): {fast_moving}")
+            print(f"   Slow Moving Products (≤5 movements): {slow_moving}")
             
-            # Analysis 4: Stock health
+            # Analysis 3: Stock health
             print("\n💊 Stock Health Analysis:")
-            stock_health = sdf.groupBy('producto_id').agg(
-                F.avg('stock_despues').alias('avg_stock'),
-                F.min('stock_despues').alias('min_stock'),
-                F.max('stock_despues').alias('max_stock')
-            )
+            stock_health = pdf.groupby('producto_id').agg({
+                'stock_despues': ['mean', 'min', 'max']
+            }).reset_index()
+            stock_health.columns = ['producto_id', 'avg_stock', 'min_stock', 'max_stock']
             
-            low_stock = stock_health.filter(F.col('avg_stock') < 10)
-            critical_stock = stock_health.filter(F.col('min_stock') == 0)
+            low_stock = (stock_health['avg_stock'] < 10).sum()
+            critical_stock = (stock_health['min_stock'] == 0).sum()
             
-            print(f"Products with Low Stock (<10): {low_stock.count()}")
-            print(f"Products with Critical Stock (0): {critical_stock.count()}")
+            print(f"   Products with Low Stock (<10): {low_stock}")
+            print(f"   Products with Critical Stock (0): {critical_stock}")
             
             return {
-                'top_products': top_products.collect(),
-                'daily_trend': daily_trend.collect(),
-                'stock_health': stock_health.collect()
+                'top_products': top_products,
+                'velocity': velocity,
+                'stock_health': stock_health
             }
             
         except Exception as e:
             print(f"❌ Error analyzing data: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def detect_anomalies(self):
@@ -129,30 +130,43 @@ class SparkDataAnalyzer:
             
             pdf = pd.DataFrame(movements)
             pdf['fecha'] = pd.to_datetime(pdf['fecha'])
-            sdf = self.spark.createDataFrame(pdf)
             
             # Calculate statistics by product
-            window_spec = Window.partitionBy('producto_id')
+            anomalies = []
             
-            stats = sdf.withColumn(
-                'avg_qty', F.avg('cantidad').over(window_spec)
-            ).withColumn(
-                'stddev_qty', F.stddev('cantidad').over(window_spec)
-            )
+            for producto_id in pdf['producto_id'].unique():
+                product_data = pdf[pdf['producto_id'] == producto_id]
+                
+                avg_qty = product_data['cantidad'].mean()
+                stddev_qty = product_data['cantidad'].std()
+                
+                if pd.isna(stddev_qty) or stddev_qty == 0:
+                    stddev_qty = 1
+                
+                # Find anomalies (>2 standard deviations)
+                anomaly_mask = (
+                    (product_data['cantidad'] > avg_qty + 2 * stddev_qty) |
+                    (product_data['cantidad'] < avg_qty - 2 * stddev_qty)
+                )
+                
+                anomaly_rows = product_data[anomaly_mask].copy()
+                anomaly_rows['avg_qty'] = avg_qty
+                anomaly_rows['stddev_qty'] = stddev_qty
+                anomalies.append(anomaly_rows)
             
-            # Identify anomalies (>2 standard deviations)
-            anomalies = stats.filter(
-                (F.col('cantidad') > F.col('avg_qty') + 2 * F.col('stddev_qty')) |
-                (F.col('cantidad') < F.col('avg_qty') - 2 * F.col('stddev_qty'))
-            )
+            if anomalies:
+                anomaly_df = pd.concat(anomalies, ignore_index=True)
+                print(f"🔍 Found {len(anomaly_df)} anomalous transactions:")
+                print(anomaly_df[['producto_id', 'cantidad', 'fecha', 'tipo']].head(10).to_string())
+            else:
+                print("✅ No anomalies detected")
             
-            print(f"🔍 Found {anomalies.count()} anomalous transactions:")
-            anomalies.select('producto_id', 'cantidad', 'avg_qty', 'fecha').show(10)
-            
-            return anomalies.collect()
+            return anomalies
             
         except Exception as e:
             print(f"❌ Error detecting anomalies: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def generate_insights_report(self):
@@ -168,16 +182,15 @@ class SparkDataAnalyzer:
             
             pdf = pd.DataFrame(movements)
             pdf['fecha'] = pd.to_datetime(pdf['fecha'])
-            sdf = self.spark.createDataFrame(pdf)
             
             # Report metrics
             total_products = len(products)
-            total_movements = sdf.count()
-            total_quantity_moved = sdf.agg(F.sum('cantidad')).collect()[0][0]
+            total_movements = len(pdf)
+            total_quantity_moved = pdf['cantidad'].sum()
             
             print(f"📦 Total Products: {total_products}")
             print(f"📝 Total Movements: {total_movements}")
-            print(f"📊 Total Quantity Moved: {total_quantity_moved}")
+            print(f"📊 Total Quantity Moved: {int(total_quantity_moved)}")
             
             # Performance insights
             self.analyze_sales_patterns()
@@ -191,4 +204,6 @@ class SparkDataAnalyzer:
             
         except Exception as e:
             print(f"❌ Error generating report: {e}")
+            import traceback
+            traceback.print_exc()
             return False

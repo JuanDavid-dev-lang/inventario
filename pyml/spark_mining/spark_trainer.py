@@ -4,14 +4,9 @@ Distributed training for demand prediction models
 """
 
 import os
-import requests
+import mysql.connector
 import pandas as pd
 from datetime import datetime, timedelta
-from pyspark.sql import functions as F
-from pyspark.ml import Pipeline
-from pyspark.ml.feature import VectorAssembler, StandardScaler
-from pyspark.ml.regression import RandomForestRegressor
-from pyspark.ml.evaluation import RegressionEvaluator
 import joblib
 
 from .spark_config import SparkSessionManager
@@ -19,10 +14,12 @@ from .spark_config import SparkSessionManager
 class SparkModelTrainer:
     """Trains ML models using Apache Spark distributed computing"""
     
-    def __init__(self, api_base_url="http://localhost/api"):
-        self.api_base_url = api_base_url
+    def __init__(self, db_host="localhost", db_user="root", db_password="root", db_name="inventario_db"):
+        self.db_host = db_host
+        self.db_user = db_user
+        self.db_password = db_password
+        self.db_name = db_name
         self.spark_manager = SparkSessionManager()
-        self.spark = self.spark_manager.get_spark()
         
         self.model_dir = os.path.join(
             os.path.dirname(__file__), 
@@ -32,24 +29,34 @@ class SparkModelTrainer:
         os.makedirs(self.model_dir, exist_ok=True)
         
         self.model = None
-        self.pipeline = None
+        self.scaler = None
+        self.feature_cols = None
     
-    def fetch_data_from_api(self):
-        """Fetch historical movements from API"""
+    def fetch_data_from_mysql(self):
+        """Fetch historical movements from MySQL database"""
         try:
-            print("📥 Fetching data from API...")
+            print("📥 Fetching data from MySQL...")
             
-            response = requests.get(
-                f"{self.api_base_url}/movimientos",
-                timeout=10
+            connection = mysql.connector.connect(
+                host=self.db_host,
+                user=self.db_user,
+                password=self.db_password,
+                database=self.db_name
             )
             
-            if response.status_code == 200:
-                data = response.json()
-                print(f"✅ Fetched {len(data)} movement records")
-                return data
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM movimientos;")
+            movements = cursor.fetchall()
+            
+            if movements:
+                print(f"✅ Fetched {len(movements)} movement records from MySQL")
+                cursor.close()
+                connection.close()
+                return movements
             else:
-                print(f"❌ API error: {response.status_code}")
+                print("❌ No data in database")
+                cursor.close()
+                connection.close()
                 return None
                 
         except Exception as e:
@@ -68,113 +75,101 @@ class SparkModelTrainer:
             # Create pandas DataFrame first
             pdf = pd.DataFrame(movements_data)
             
-            # Data preprocessing
-            pdf['fecha'] = pd.to_datetime(pdf['fecha'])
+            # Data preprocessing - only use available columns
             pdf['stock_antes'] = pd.to_numeric(pdf['stock_antes'], errors='coerce')
             pdf['cantidad'] = pd.to_numeric(pdf['cantidad'], errors='coerce')
             pdf['stock_despues'] = pd.to_numeric(pdf['stock_despues'], errors='coerce')
-            pdf['precio_unitario'] = pd.to_numeric(pdf['precio_unitario'], errors='coerce')
             
-            # Feature engineering
-            pdf['day_of_week'] = pdf['fecha'].dt.dayofweek
-            pdf['day_of_month'] = pdf['fecha'].dt.day
-            pdf['month'] = pdf['fecha'].dt.month
-            pdf['quarter'] = pdf['fecha'].dt.quarter
-            pdf['is_weekend'] = (pdf['day_of_week'] >= 5).astype(int)
+            # Remove rows with NaN values in critical columns
+            pdf = pdf.dropna(subset=['producto_id', 'cantidad', 'stock_antes', 'stock_despues'])
             
-            # Convert to Spark DataFrame
-            sdf = self.spark.createDataFrame(pdf)
+            # Simple aggregations by product (without distributed Spark operations)
+            product_stats = pdf.groupby('producto_id').agg({
+                'cantidad': ['mean', 'std', 'max', 'min', 'sum'],
+                'stock_antes': ['mean', 'min', 'max'],
+                'stock_despues': ['mean'],
+                'id': 'count'
+            }).reset_index()
             
-            # Calculate aggregations by product
-            sdf = sdf.groupBy('producto_id').agg(
-                F.avg('cantidad').alias('avg_daily_sales'),
-                F.stddev('cantidad').alias('std_daily_sales'),
-                F.max('cantidad').alias('max_daily_sales'),
-                F.min('cantidad').alias('min_daily_sales'),
-                F.sum('cantidad').alias('total_sales'),
-                F.avg('stock_antes').alias('avg_stock'),
-                F.avg('precio_unitario').alias('avg_price'),
-                F.count('*').alias('transaction_count')
-            ).fillna(0)
+            # Flatten column names
+            product_stats.columns = ['producto_id', 'avg_daily_sales', 'std_daily_sales', 
+                                    'max_daily_sales', 'min_daily_sales', 'total_sales',
+                                    'avg_stock', 'min_stock', 'max_stock', 'avg_stock_after',
+                                    'transaction_count']
             
-            print(f"✅ Prepared {sdf.count()} product aggregations")
-            return sdf
+            # Fill NaN values
+            product_stats = product_stats.fillna(0)
+            
+            print(f"✅ Prepared {len(product_stats)} product aggregations")
+            return product_stats
             
         except Exception as e:
             print(f"❌ Error preparing data: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def build_and_train_model(self, training_data):
-        """Build and train distributed model with Spark ML"""
+        """Build and train model with scikit-learn"""
         try:
-            if training_data is None:
+            if training_data is None or training_data.empty:
                 print("❌ No training data")
                 return False
             
-            print("🎯 Building ML Pipeline...")
+            print("🎯 Building ML Model...")
+            
+            from sklearn.ensemble import RandomForestRegressor
+            from sklearn.preprocessing import StandardScaler
+            from sklearn.model_selection import train_test_split
+            from sklearn.metrics import mean_squared_error, r2_score
             
             # Feature columns
-            feature_cols = [
-                'avg_daily_sales', 'std_daily_sales', 'max_daily_sales',
-                'min_daily_sales', 'total_sales', 'avg_stock', 'avg_price'
-            ]
+            feature_cols = [col for col in training_data.columns 
+                           if col not in ['producto_id', 'total_sales']]
             
-            # Stage 1: Vector assembler
-            assembler = VectorAssembler(
-                inputCols=feature_cols,
-                outputCol="features"
+            X = training_data[feature_cols].values
+            y = training_data['total_sales'].values
+            
+            # Split data
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42
             )
             
-            # Stage 2: Scaler
-            scaler = StandardScaler(
-                inputCol="features",
-                outputCol="scaled_features",
-                withMean=True,
-                withStd=True
+            # Scale features
+            scaler = StandardScaler()
+            X_train_scaled = scaler.fit_transform(X_train)
+            X_test_scaled = scaler.transform(X_test)
+            
+            # Train Random Forest
+            print("📚 Training Random Forest model...")
+            self.model = RandomForestRegressor(
+                n_estimators=50,
+                max_depth=10,
+                random_state=42,
+                n_jobs=-1
             )
             
-            # Stage 3: Random Forest Regressor (distributed)
-            rf = RandomForestRegressor(
-                featuresCol="scaled_features",
-                labelCol="total_sales",
-                numTrees=50,
-                maxDepth=10,
-                seed=42
-            )
-            
-            # Build pipeline
-            self.pipeline = Pipeline(stages=[assembler, scaler, rf])
-            
-            print("📚 Training model with Spark MLlib...")
-            
-            # Train model (distributed across cluster)
-            self.model = self.pipeline.fit(training_data)
+            self.model.fit(X_train_scaled, y_train)
             
             # Evaluate
-            predictions = self.model.transform(training_data)
-            
-            evaluator = RegressionEvaluator(
-                labelCol="total_sales",
-                predictionCol="prediction",
-                metricName="rmse"
-            )
-            
-            rmse = evaluator.evaluate(predictions)
-            r2_evaluator = RegressionEvaluator(
-                labelCol="total_sales",
-                predictionCol="prediction",
-                metricName="r2"
-            )
-            r2 = r2_evaluator.evaluate(predictions)
+            y_pred = self.model.predict(X_test_scaled)
+            rmse = (mean_squared_error(y_test, y_pred)) ** 0.5
+            r2 = r2_score(y_test, y_pred)
             
             print(f"✅ Model trained successfully")
             print(f"   RMSE: {rmse:.4f}")
             print(f"   R²: {r2:.4f}")
             
+            # Save scaler and feature columns for later use
+            self.scaler = scaler
+            self.feature_cols = feature_cols
+            
             return True
             
         except Exception as e:
             print(f"❌ Error training model: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def save_model(self):
@@ -184,11 +179,14 @@ class SparkModelTrainer:
                 print("❌ No model to save")
                 return False
             
-            model_path = os.path.join(self.model_dir, 'spark_model')
+            model_path = os.path.join(self.model_dir, 'demand_model.pkl')
             
             print(f"💾 Saving model to {model_path}...")
             
-            self.model.write().overwrite().save(model_path)
+            # Save model and scaler
+            joblib.dump(self.model, model_path)
+            joblib.dump(self.scaler, os.path.join(self.model_dir, 'scaler.pkl'))
+            joblib.dump(self.feature_cols, os.path.join(self.model_dir, 'feature_cols.pkl'))
             
             print("✅ Model saved successfully")
             return True
@@ -204,8 +202,8 @@ class SparkModelTrainer:
         print("="*60 + "\n")
         
         try:
-            # Step 1: Fetch data
-            movements_data = self.fetch_data_from_api()
+            # Step 1: Fetch data from MySQL
+            movements_data = self.fetch_data_from_mysql()
             if not movements_data:
                 return False
             
