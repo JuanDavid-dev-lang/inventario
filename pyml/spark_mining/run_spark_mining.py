@@ -6,11 +6,11 @@ import sys
 import os
 
 # Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from spark_trainer import SparkModelTrainer
-from spark_analyzer import SparkDataAnalyzer
-from spark_config import SparkSessionManager
+from .spark_trainer import SparkModelTrainer
+from .spark_analyzer import SparkDataAnalyzer
+from .spark_config import SparkSessionManager
 
 def main():
     """Run Spark mining operations"""
