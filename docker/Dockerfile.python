@@ -3,28 +3,31 @@
 
 FROM python:3.9-slim
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    openjdk-11-jre-headless \
+# Install system dependencies including Java
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    default-jre \
     git \
     curl \
+    ca-certificates \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
 # Copy requirements
-COPY pyml/requirements.txt .
+COPY inventario/pyml/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Python code
-COPY pyml/ .
+COPY inventario/pyml/ .
 
-# Set JAVA_HOME for Spark
+# Set JAVA_HOME  
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
+ENV PYTHONUNBUFFERED=1
 
 # Expose Spark UI port
 EXPOSE 4040 8888
