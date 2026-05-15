@@ -28,9 +28,11 @@ RUN a2enmod rewrite
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy entire project
-COPY ./backend/ .
-COPY ./docker/apache.conf /etc/apache2/sites-available/000-default.conf
+# Copy backend files
+COPY backend/ .
+
+# Copy Apache config
+COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
