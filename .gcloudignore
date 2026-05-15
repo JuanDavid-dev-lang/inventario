@@ -1,0 +1,35 @@
+# Git directories and files
+.git/
+.gitignore
+.gitattributes
+
+# IDE configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependency cache (keep actual dependencies for Docker)
+.npm
+.eslintcache
+
+# Local environment files
+.env.local
+.env.*.local
+
+# OS files
+Thumbs.db
+
+# Test coverage and reports
+coverage/
+htmlcov/
+.phpunit.cache/
+
+# Logs (keep them small)
+*.log
+logs/
+
+# Backups directory (Cloud Build doesn't need old backups)
+backups/

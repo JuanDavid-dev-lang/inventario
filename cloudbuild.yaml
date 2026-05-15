@@ -1,3 +1,7 @@
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  
 steps:
   # Build Backend
   - name: 'gcr.io/cloud-builders/docker'
@@ -6,8 +10,11 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/inventario-backend'
       - '-f'
-      - './docker/Dockerfile.backend'
+      - 'docker/Dockerfile.backend'
+      - '--no-cache'
       - '.'
+    dir: '.'
+    waitFor: ['-']
 
   # Build Frontend
   - name: 'gcr.io/cloud-builders/docker'
@@ -16,8 +23,11 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/inventario-frontend'
       - '-f'
-      - './docker/Dockerfile.frontend'
+      - 'docker/Dockerfile.frontend'
+      - '--no-cache'
       - '.'
+    dir: '.'
+    waitFor: ['-']
 
   # Push Backend
   - name: 'gcr.io/cloud-builders/docker'
