@@ -1,0 +1,21 @@
+{
+  "name": "inventario-app",
+  "version": "1.0.0",
+  "description": "Inventario app - Frontend (Vue.js) + Backend (PHP)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "cd frontend && npm install && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
