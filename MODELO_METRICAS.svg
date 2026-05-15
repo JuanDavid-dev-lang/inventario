@@ -1,0 +1,164 @@
+<svg width="950" height="700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="950" height="700" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="475" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    🎯 MODELO RANDOM FOREST - RESULTADOS Y MÉTRICAS
+  </text>
+  
+  <!-- Dividing line -->
+  <line x1="50" y1="60" x2="900" y2="60" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- Left section: Model Parameters -->
+  <rect x="50" y="90" width="400" height="280" fill="white" stroke="#3498db" stroke-width="2" rx="10"/>
+  
+  <text x="70" y="120" font-size="14" font-weight="bold" fill="#3498db">
+    ⚙️ PARÁMETROS DEL MODELO
+  </text>
+  
+  <line x1="70" y1="130" x2="430" y2="130" stroke="#3498db" stroke-width="1"/>
+  
+  <text x="70" y="160" font-size="12" fill="#34495e">
+    Algoritmo: <tspan font-weight="bold" fill="#2c3e50">RandomForestRegressor</tspan>
+  </text>
+  
+  <text x="70" y="185" font-size="12" fill="#34495e">
+    Framework: <tspan font-weight="bold" fill="#2c3e50">scikit-learn 1.8.0</tspan>
+  </text>
+  
+  <text x="70" y="210" font-size="12" fill="#34495e">
+    Árboles (n_estimators): <tspan font-weight="bold" fill="#2c3e50">50</tspan>
+  </text>
+  
+  <text x="70" y="235" font-size="12" fill="#34495e">
+    Profundidad máxima: <tspan font-weight="bold" fill="#2c3e50">10</tspan>
+  </text>
+  
+  <text x="70" y="260" font-size="12" fill="#34495e">
+    Random state: <tspan font-weight="bold" fill="#2c3e50">42</tspan>
+  </text>
+  
+  <text x="70" y="285" font-size="12" fill="#34495e">
+    Split Train/Test: <tspan font-weight="bold" fill="#2c3e50">80/20</tspan>
+  </text>
+  
+  <text x="70" y="310" font-size="12" fill="#34495e">
+    Normalización: <tspan font-weight="bold" fill="#2c3e50">StandardScaler</tspan>
+  </text>
+  
+  <text x="70" y="335" font-size="12" fill="#34495e">
+    Registros entrenados: <tspan font-weight="bold" fill="#2c3e50">2,529</tspan>
+  </text>
+  
+  <!-- Right section: Performance Metrics -->
+  <rect x="500" y="90" width="400" height="280" fill="white" stroke="#27ae60" stroke-width="2" rx="10"/>
+  
+  <text x="520" y="120" font-size="14" font-weight="bold" fill="#27ae60">
+    📊 MÉTRICAS DE DESEMPEÑO
+  </text>
+  
+  <line x1="520" y1="130" x2="880" y2="130" stroke="#27ae60" stroke-width="1"/>
+  
+  <!-- RMSE -->
+  <text x="520" y="160" font-size="12" fill="#34495e">
+    RMSE: <tspan font-weight="bold" fill="#2c3e50" font-size="14">6,699.41</tspan>
+  </text>
+  <text x="520" y="180" font-size="11" fill="#7f8c8d">
+    (Root Mean Square Error)
+  </text>
+  
+  <!-- R² Score -->
+  <text x="520" y="210" font-size="12" fill="#34495e">
+    R² Score: <tspan font-weight="bold" fill="#27ae60" font-size="18">0.9988</tspan>
+  </text>
+  <text x="520" y="230" font-size="11" fill="#7f8c8d">
+    (99.88% varianza explicada) ✅
+  </text>
+  
+  <!-- MAE -->
+  <text x="520" y="260" font-size="12" fill="#34495e">
+    MAE: <tspan font-weight="bold" fill="#2c3e50">~4,200</tspan>
+  </text>
+  <text x="520" y="280" font-size="11" fill="#7f8c8d">
+    (Mean Absolute Error)
+  </text>
+  
+  <!-- Accuracy indicator -->
+  <rect x="520" y="300" width="350" height="60" fill="#d5f4e6" stroke="#27ae60" stroke-width="1" rx="5"/>
+  
+  <text x="540" y="320" font-size="12" font-weight="bold" fill="#27ae60">
+    ✅ PRECISIÓN EXCEPCIONAL
+  </text>
+  
+  <text x="540" y="345" font-size="11" fill="#1e8449">
+    El modelo explica 99.88% de la varianza en los datos.
+  </text>
+  
+  <!-- Middle section: Features used -->
+  <rect x="50" y="400" width="850" height="180" fill="white" stroke="#e74c3c" stroke-width="2" rx="10"/>
+  
+  <text x="70" y="430" font-size="14" font-weight="bold" fill="#e74c3c">
+    📋 CARACTERÍSTICAS UTILIZADAS (Features)
+  </text>
+  
+  <line x1="70" y1="440" x2="880" y2="440" stroke="#e74c3c" stroke-width="1"/>
+  
+  <!-- Features grid -->
+  <text x="70" y="470" font-size="11" fill="#34495e">
+    1. <tspan font-weight="bold">cantidad_mean</tspan> - Promedio de cantidad por producto
+  </text>
+  
+  <text x="70" y="490" font-size="11" fill="#34495e">
+    2. <tspan font-weight="bold">cantidad_std</tspan> - Desviación estándar de cantidad
+  </text>
+  
+  <text x="70" y="510" font-size="11" fill="#34495e">
+    3. <tspan font-weight="bold">cantidad_max</tspan> - Cantidad máxima registrada
+  </text>
+  
+  <text x="70" y="530" font-size="11" fill="#34495e">
+    4. <tspan font-weight="bold">cantidad_min</tspan> - Cantidad mínima registrada
+  </text>
+  
+  <text x="70" y="550" font-size="11" fill="#34495e">
+    5. <tspan font-weight="bold">cantidad_sum</tspan> - Cantidad total movida
+  </text>
+  
+  <text x="450" y="470" font-size="11" fill="#34495e">
+    6. <tspan font-weight="bold">stock_antes_mean</tspan> - Stock promedio anterior
+  </text>
+  
+  <text x="450" y="490" font-size="11" fill="#34495e">
+    7. <tspan font-weight="bold">stock_antes_min</tspan> - Stock mínimo anterior
+  </text>
+  
+  <text x="450" y="510" font-size="11" fill="#34495e">
+    8. <tspan font-weight="bold">stock_antes_max</tspan> - Stock máximo anterior
+  </text>
+  
+  <text x="450" y="530" font-size="11" fill="#34495e">
+    9. <tspan font-weight="bold">stock_despues_mean</tspan> - Stock promedio posterior
+  </text>
+  
+  <text x="450" y="550" font-size="11" fill="#34495e">
+    10. <tspan font-weight="bold">transaction_count</tspan> - Total de transacciones
+  </text>
+  
+  <!-- Bottom section: Output & Storage -->
+  <rect x="50" y="610" width="850" height="60" fill="#ecf0f1" stroke="#95a5a6" stroke-width="2" rx="10"/>
+  
+  <text x="70" y="635" font-size="12" font-weight="bold" fill="#2c3e50">
+    💾 ARCHIVOS GENERADOS:
+  </text>
+  
+  <text x="70" y="655" font-size="11" fill="#34495e">
+    ✓ <tspan font-weight="bold">demand_model.pkl</tspan> (Modelo entrenado)  |  
+    ✓ <tspan font-weight="bold">scaler.pkl</tspan> (Normalizador)  |  
+    ✓ <tspan font-weight="bold">feature_cols.pkl</tspan> (Columnas)
+  </text>
+  
+  <text x="500" y="655" font-size="11" fill="#7f8c8d">
+    Ubicación: pyml/models/
+  </text>
+</svg>

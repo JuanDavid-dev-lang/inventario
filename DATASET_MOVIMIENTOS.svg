@@ -1,0 +1,97 @@
+<svg width="900" height="700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="900" height="700" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    🚚 Dataset de MOVIMIENTOS (7,277 registros)
+  </text>
+  
+  <!-- Dividing line -->
+  <line x1="50" y1="60" x2="850" y2="60" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- Left side: Stacked bar chart -->
+  <text x="70" y="110" font-size="16" font-weight="bold" fill="#34495e">Distribución por Tipo</text>
+  
+  <!-- Bar 1: Entrada -->
+  <rect x="70" y="140" width="450" height="50" fill="#27ae60" rx="5"/>
+  <text x="85" y="175" font-size="14" font-weight="bold" fill="white">ENTRADA</text>
+  <text x="530" y="175" font-size="14" font-weight="bold" fill="#27ae60">2,500 (34%)</text>
+  
+  <!-- Bar 2: Salida -->
+  <rect x="70" y="210" width="350" height="50" fill="#e67e22" rx="5"/>
+  <text x="85" y="245" font-size="14" font-weight="bold" fill="white">SALIDA</text>
+  <text x="430" y="245" font-size="14" font-weight="bold" fill="#e67e22">2,100 (29%)</text>
+  
+  <!-- Bar 3: Ajuste -->
+  <rect x="70" y="280" width="300" height="50" fill="#3498db" rx="5"/>
+  <text x="85" y="315" font-size="14" font-weight="bold" fill="white">AJUSTE</text>
+  <text x="380" y="315" font-size="14" font-weight="bold" fill="#3498db">1,800 (25%)</text>
+  
+  <!-- Bar 4: Otros (errores/generados) -->
+  <rect x="70" y="350" width="240" height="50" fill="#c0392b" rx="5"/>
+  <text x="85" y="385" font-size="14" font-weight="bold" fill="white">CON ERRORES (20%)</text>
+  <text x="320" y="385" font-size="14" font-weight="bold" fill="#c0392b">877</text>
+  
+  <!-- Right side: Pie Chart -->
+  <text x="620" y="110" font-size="16" font-weight="bold" fill="#34495e">Proporción por Tipo</text>
+  
+  <!-- Pie circle background -->
+  <circle cx="700" cy="240" r="90" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+  
+  <!-- Pie segments -->
+  <!-- Entrada (34%) -->
+  <circle cx="700" cy="240" r="65" fill="none" stroke="#27ae60" stroke-width="40"
+          stroke-dasharray="139.2 411.2" stroke-dashoffset="0"/>
+  
+  <!-- Salida (29%) -->
+  <circle cx="700" cy="240" r="65" fill="none" stroke="#e67e22" stroke-width="40"
+          stroke-dasharray="119.1 411.2" stroke-dashoffset="-139.2"/>
+  
+  <!-- Ajuste (25%) -->
+  <circle cx="700" cy="240" r="65" fill="none" stroke="#3498db" stroke-width="40"
+          stroke-dasharray="102.8 411.2" stroke-dashoffset="-258.3"/>
+  
+  <!-- Errores (12%) -->
+  <circle cx="700" cy="240" r="65" fill="none" stroke="#c0392b" stroke-width="40"
+          stroke-dasharray="49.3 411.2" stroke-dashoffset="-361.1"/>
+  
+  <!-- Pie labels -->
+  <text x="715" y="160" font-size="12" font-weight="bold" fill="#27ae60">34%</text>
+  <text x="750" y="260" font-size="12" font-weight="bold" fill="#e67e22">29%</text>
+  <text x="680" y="330" font-size="12" font-weight="bold" fill="#3498db">25%</text>
+  <text x="645" y="235" font-size="11" font-weight="bold" fill="#c0392b">12%</text>
+  
+  <!-- Bottom section: Detailed stats -->
+  <rect x="50" y="430" width="800" height="240" fill="#ecf0f1" rx="10"/>
+  
+  <text x="70" y="460" font-size="14" font-weight="bold" fill="#2c3e50">📊 ESTADÍSTICAS DETALLADAS:</text>
+  
+  <text x="70" y="490" font-size="12" fill="#34495e">
+    • Total de movimientos: <tspan font-weight="bold" fill="#2c3e50">7,277</tspan>
+  </text>
+  
+  <text x="70" y="515" font-size="12" fill="#34495e">
+    • Originales de la BD: <tspan font-weight="bold" fill="#2c3e50">50</tspan>
+  </text>
+  
+  <text x="70" y="540" font-size="12" fill="#34495e">
+    • Generados automáticamente: <tspan font-weight="bold" fill="#2c3e50">7,227 (99.3%)</tspan>
+  </text>
+  
+  <!-- Error types -->
+  <text x="70" y="575" font-size="11" font-weight="bold" fill="#2c3e50">🔴 Tipos de errores intencionales (20%):</text>
+  
+  <text x="90" y="600" font-size="11" fill="#34495e">
+    ❌ Cantidades negativas (-100, -50, -999) • ❌ Cantidades excesivas (999999, 50000)
+  </text>
+  
+  <text x="90" y="625" font-size="11" fill="#34495e">
+    ❌ Duplicados de productos • ❌ Stock inconsistentes • ❌ Valores null en motivo
+  </text>
+  
+  <!-- Footer -->
+  <text x="450" y="690" font-size="11" text-anchor="middle" fill="#7f8c8d">
+    Dataset generado el 06 de mayo de 2026 | Total de cantidad movida: 106,296,744 unidades
+  </text>
+</svg>

@@ -1,0 +1,78 @@
+<svg width="900" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="900" height="600" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    📦 Dataset de PRODUCTOS (2,735 registros)
+  </text>
+  
+  <!-- Dividing line -->
+  <line x1="50" y1="60" x2="850" y2="60" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- Left side: Horizontal bar chart -->
+  <text x="70" y="110" font-size="16" font-weight="bold" fill="#34495e">Distribución de Productos</text>
+  
+  <!-- Bar 1: Originales -->
+  <rect x="70" y="140" width="150" height="50" fill="#e74c3c" rx="5"/>
+  <text x="85" y="175" font-size="14" font-weight="bold" fill="white">Originales</text>
+  <text x="230" y="175" font-size="14" font-weight="bold" fill="#e74c3c">735</text>
+  
+  <!-- Bar 2: Generados -->
+  <rect x="70" y="210" width="600" height="50" fill="#9b59b6" rx="5"/>
+  <text x="85" y="245" font-size="14" font-weight="bold" fill="white">Generados</text>
+  <text x="680" y="245" font-size="14" font-weight="bold" fill="#9b59b6">2,000</text>
+  
+  <!-- Pie Chart on right side -->
+  <text x="700" y="110" font-size="16" font-weight="bold" fill="#34495e">Proporción</text>
+  
+  <!-- Pie circle background -->
+  <circle cx="750" cy="230" r="80" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+  
+  <!-- Pie segments (735/2735 ≈ 27%, 2000/2735 ≈ 73%) -->
+  <!-- Originales -->
+  <circle cx="750" cy="230" r="60" fill="none" stroke="#e74c3c" stroke-width="35"
+          stroke-dasharray="106.4 352.1" stroke-dashoffset="0"/>
+  
+  <!-- Generados -->
+  <circle cx="750" cy="230" r="60" fill="none" stroke="#9b59b6" stroke-width="35"
+          stroke-dasharray="245.7 352.1" stroke-dashoffset="-106.4"/>
+  
+  <!-- Pie labels -->
+  <text x="740" y="155" font-size="13" font-weight="bold" fill="#e74c3c">27%</text>
+  <text x="730" y="315" font-size="13" font-weight="bold" fill="#9b59b6">73%</text>
+  
+  <!-- Bottom section: Categories -->
+  <rect x="50" y="330" width="800" height="230" fill="#ecf0f1" rx="10"/>
+  
+  <text x="70" y="360" font-size="14" font-weight="bold" fill="#2c3e50">📊 ESTADÍSTICAS Y CATEGORÍAS:</text>
+  
+  <!-- Stats grid -->
+  <text x="70" y="395" font-size="12" fill="#34495e">
+    • Total de productos: <tspan font-weight="bold" fill="#2c3e50">2,735</tspan>
+  </text>
+  
+  <text x="70" y="420" font-size="12" fill="#34495e">
+    • Originales de la BD: <tspan font-weight="bold" fill="#e74c3c">735 (27%)</tspan>
+  </text>
+  
+  <text x="70" y="445" font-size="12" fill="#34495e">
+    • Generados automáticamente: <tspan font-weight="bold" fill="#9b59b6">2,000 (73%)</tspan>
+  </text>
+  
+  <!-- Categories -->
+  <text x="70" y="480" font-size="11" font-weight="bold" fill="#2c3e50">Categorías incluidas:</text>
+  
+  <text x="90" y="505" font-size="11" fill="#34495e">
+    🏷️ Electrónica • 📚 Libros • 👕 Ropa • 🍽️ Hogar • 💻 Informática
+  </text>
+  
+  <text x="90" y="530" font-size="11" fill="#34495e">
+    🎮 Entretenimiento • 🛠️ Herramientas • ⚽ Deportes • 🎓 Educación
+  </text>
+  
+  <!-- Footer -->
+  <text x="450" y="580" font-size="11" text-anchor="middle" fill="#7f8c8d">
+    Dataset generado el 06 de mayo de 2026 | Precio venta promedio: $1,500 - $5,000
+  </text>
+</svg>

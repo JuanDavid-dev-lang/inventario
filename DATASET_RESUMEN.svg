@@ -1,0 +1,152 @@
+<svg width="1000" height="650" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1000" height="650" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="500" y="40" font-size="32" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    📈 RESUMEN GENERAL DEL DATASET (10,022 registros)
+  </text>
+  
+  <!-- Dividing line -->
+  <line x1="50" y1="60" x2="950" y2="60" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- Three main cards -->
+  
+  <!-- Card 1: USUARIOS -->
+  <rect x="50" y="100" width="280" height="220" fill="white" stroke="#3498db" stroke-width="3" rx="10"/>
+  <rect x="50" y="100" width="280" height="50" fill="#3498db" rx="10 10 0 0"/>
+  
+  <text x="190" y="135" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+    👥 USUARIOS
+  </text>
+  
+  <!-- Big number -->
+  <text x="190" y="190" font-size="48" font-weight="bold" text-anchor="middle" fill="#3498db">
+    10
+  </text>
+  
+  <!-- Stats -->
+  <text x="70" y="230" font-size="12" fill="#34495e">
+    Originales: <tspan font-weight="bold">2</tspan>
+  </text>
+  
+  <text x="70" y="255" font-size="12" fill="#34495e">
+    Generados: <tspan font-weight="bold">8</tspan>
+  </text>
+  
+  <text x="70" y="280" font-size="12" fill="#34495e">
+    Porcentaje: <tspan font-weight="bold">0.1%</tspan> del total
+  </text>
+  
+  <text x="70" y="305" font-size="11" fill="#7f8c8d">
+    Roles: Admin, Supervisor, Usuario
+  </text>
+  
+  <!-- Card 2: PRODUCTOS -->
+  <rect x="360" y="100" width="280" height="220" fill="white" stroke="#9b59b6" stroke-width="3" rx="10"/>
+  <rect x="360" y="100" width="280" height="50" fill="#9b59b6" rx="10 10 0 0"/>
+  
+  <text x="500" y="135" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+    📦 PRODUCTOS
+  </text>
+  
+  <!-- Big number -->
+  <text x="500" y="190" font-size="48" font-weight="bold" text-anchor="middle" fill="#9b59b6">
+    2.7K
+  </text>
+  
+  <!-- Stats -->
+  <text x="380" y="230" font-size="12" fill="#34495e">
+    Originales: <tspan font-weight="bold">735</tspan>
+  </text>
+  
+  <text x="380" y="255" font-size="12" fill="#34495e">
+    Generados: <tspan font-weight="bold">2,000</tspan>
+  </text>
+  
+  <text x="380" y="280" font-size="12" fill="#34495e">
+    Porcentaje: <tspan font-weight="bold">27.3%</tspan> del total
+  </text>
+  
+  <text x="380" y="305" font-size="11" fill="#7f8c8d">
+    Con categorías y precios
+  </text>
+  
+  <!-- Card 3: MOVIMIENTOS -->
+  <rect x="670" y="100" width="280" height="220" fill="white" stroke="#e74c3c" stroke-width="3" rx="10"/>
+  <rect x="670" y="100" width="280" height="50" fill="#e74c3c" rx="10 10 0 0"/>
+  
+  <text x="810" y="135" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+    🚚 MOVIMIENTOS
+  </text>
+  
+  <!-- Big number -->
+  <text x="810" y="190" font-size="48" font-weight="bold" text-anchor="middle" fill="#e74c3c">
+    7.2K
+  </text>
+  
+  <!-- Stats -->
+  <text x="690" y="230" font-size="12" fill="#34495e">
+    Originales: <tspan font-weight="bold">50</tspan>
+  </text>
+  
+  <text x="690" y="255" font-size="12" fill="#34495e">
+    Generados: <tspan font-weight="bold">7,227</tspan>
+  </text>
+  
+  <text x="690" y="280" font-size="12" fill="#34495e">
+    Porcentaje: <tspan font-weight="bold">72.6%</tspan> del total
+  </text>
+  
+  <text x="690" y="305" font-size="11" fill="#7f8c8d">
+    Con 20% de errores intencionales
+  </text>
+  
+  <!-- Bottom section: Quality metrics -->
+  <rect x="50" y="350" width="900" height="260" fill="#ecf0f1" rx="10"/>
+  
+  <text x="70" y="380" font-size="16" font-weight="bold" fill="#2c3e50">🔍 CALIDAD DEL DATASET - 20% ERRORES INTENCIONALES:</text>
+  
+  <!-- Error type boxes -->
+  <rect x="70" y="410" width="200" height="80" fill="#ffe0e0" stroke="#e74c3c" stroke-width="2" rx="5"/>
+  <text x="80" y="430" font-size="12" font-weight="bold" fill="#c0392b">❌ Cantidades Negativas</text>
+  <text x="80" y="450" font-size="11" fill="#34495e">-100, -50, -999</text>
+  <text x="80" y="470" font-size="11" fill="#34495e">877 registros afectados</text>
+  
+  <rect x="290" y="410" width="200" height="80" fill="#fff4e0" stroke="#e67e22" stroke-width="2" rx="5"/>
+  <text x="300" y="430" font-size="12" font-weight="bold" fill="#d35400">⚠️ Cantidades Excesivas</text>
+  <text x="300" y="450" font-size="11" fill="#34495e">999999, 50000, 10000</text>
+  <text x="300" y="470" font-size="11" fill="#34495e">~200 registros afectados</text>
+  
+  <rect x="510" y="410" width="200" height="80" fill="#e8f8f5" stroke="#27ae60" stroke-width="2" rx="5"/>
+  <text x="520" y="430" font-size="12" font-weight="bold" fill="#1e8449">✓ Duplicados Producto</text>
+  <text x="520" y="450" font-size="11" fill="#34495e">Mismo producto múltiples veces</text>
+  <text x="520" y="470" font-size="11" fill="#34495e">Patrón realista de ventas</text>
+  
+  <rect x="730" y="410" width="170" height="80" fill="#f4ecf7" stroke="#8e44ad" stroke-width="2" rx="5"/>
+  <text x="740" y="430" font-size="12" font-weight="bold" fill="#6c3483">📊 Stock Inconsistent</text>
+  <text x="740" y="450" font-size="11" fill="#34495e">Antes/después no coinciden</text>
+  <text x="740" y="470" font-size="11" fill="#34495e">Datos realistas</text>
+  
+  <!-- Bottom stats -->
+  <text x="70" y="530" font-size="12" fill="#34495e" font-weight="bold">
+    ✅ BENEFICIOS PARA ML:
+  </text>
+  
+  <text x="90" y="555" font-size="11" fill="#2c3e50">
+    • Dataset balanceado para entrenar modelos de detección de anomalías
+  </text>
+  
+  <text x="90" y="580" font-size="11" fill="#2c3e50">
+    • Errores controlados y documentados para validación
+  </text>
+  
+  <text x="90" y="605" font-size="11" fill="#2c3e50">
+    • Suficientemente grande (10K+) para entrenar RandomForest con alta precisión
+  </text>
+  
+  <!-- Footer -->
+  <text x="500" y="635" font-size="11" text-anchor="middle" fill="#7f8c8d" font-weight="bold">
+    Generado: 06 de mayo de 2026 | Estado: LISTO PARA ML | Precisión del modelo: R² = 0.9988 (99.88%)
+  </text>
+</svg>

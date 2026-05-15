@@ -1,0 +1,228 @@
+<svg width="1000" height="750" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1000" height="750" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="500" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    🎯 PREDICCIONES DEL MODELO RANDOM FOREST
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="500" y="65" font-size="12" text-anchor="middle" fill="#7f8c8d">
+    3 Escenarios de Predicción | R² = 0.9988 (99.88% Precisión)
+  </text>
+  
+  <!-- Dividing line -->
+  <line x1="50" y1="80" x2="950" y2="80" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- ESCENARIO 1: BEST-SELLER -->
+  <rect x="50" y="110" width="280" height="280" fill="white" stroke="#27ae60" stroke-width="3" rx="10"/>
+  
+  <!-- Header -->
+  <rect x="50" y="110" width="280" height="50" fill="#27ae60" rx="10 10 0 0"/>
+  <text x="190" y="145" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+    🏆 BEST-SELLER
+  </text>
+  
+  <!-- Características -->
+  <text x="70" y="180" font-size="11" fill="#34495e" font-weight="bold">Características:</text>
+  <text x="70" y="200" font-size="10" fill="#34495e">
+    • Venta promedio: 500,000 u/día
+  </text>
+  <text x="70" y="218" font-size="10" fill="#34495e">
+    • Stock promedio: 200,000 u
+  </text>
+  <text x="70" y="236" font-size="10" fill="#34495e">
+    • Transacciones: 3
+  </text>
+  
+  <!-- Predicción -->
+  <rect x="70" y="260" width="240" height="90" fill="#d5f4e6" stroke="#27ae60" stroke-width="2" rx="5"/>
+  <text x="80" y="280" font-size="11" font-weight="bold" fill="#27ae60">
+    PREDICCIÓN PARA PRÓXIMO PERÍODO:
+  </text>
+  <text x="190" y="325" font-size="36" font-weight="bold" text-anchor="middle" fill="#27ae60">
+    986,562
+  </text>
+  <text x="190" y="350" font-size="11" text-anchor="middle" fill="#27ae60">
+    unidades
+  </text>
+  
+  <!-- ESCENARIO 2: NORMAL -->
+  <rect x="360" y="110" width="280" height="280" fill="white" stroke="#3498db" stroke-width="3" rx="10"/>
+  
+  <!-- Header -->
+  <rect x="360" y="110" width="280" height="50" fill="#3498db" rx="10 10 0 0"/>
+  <text x="500" y="145" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+    📦 NORMAL
+  </text>
+  
+  <!-- Características -->
+  <text x="380" y="180" font-size="11" fill="#34495e" font-weight="bold">Características:</text>
+  <text x="380" y="200" font-size="10" fill="#34495e">
+    • Venta promedio: 1,000 u/día
+  </text>
+  <text x="380" y="218" font-size="10" fill="#34495e">
+    • Stock promedio: 5,000 u
+  </text>
+  <text x="380" y="236" font-size="10" fill="#34495e">
+    • Transacciones: 5
+  </text>
+  
+  <!-- Predicción -->
+  <rect x="380" y="260" width="240" height="90" fill="#d6eaf8" stroke="#3498db" stroke-width="2" rx="5"/>
+  <text x="390" y="280" font-size="11" font-weight="bold" fill="#3498db">
+    PREDICCIÓN PARA PRÓXIMO PERÍODO:
+  </text>
+  <text x="500" y="325" font-size="36" font-weight="bold" text-anchor="middle" fill="#3498db">
+    4,368
+  </text>
+  <text x="500" y="350" font-size="11" text-anchor="middle" fill="#3498db">
+    unidades
+  </text>
+  
+  <!-- ESCENARIO 3: SLOW-MOVING -->
+  <rect x="670" y="110" width="280" height="280" fill="white" stroke="#e74c3c" stroke-width="3" rx="10"/>
+  
+  <!-- Header -->
+  <rect x="670" y="110" width="280" height="50" fill="#e74c3c" rx="10 10 0 0"/>
+  <text x="810" y="145" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+    🐢 SLOW-MOVING
+  </text>
+  
+  <!-- Características -->
+  <text x="690" y="180" font-size="11" fill="#34495e" font-weight="bold">Características:</text>
+  <text x="690" y="200" font-size="10" fill="#34495e">
+    • Venta promedio: 100 u/día
+  </text>
+  <text x="690" y="218" font-size="10" fill="#34495e">
+    • Stock promedio: 500 u
+  </text>
+  <text x="690" y="236" font-size="10" fill="#34495e">
+    • Transacciones: 5
+  </text>
+  
+  <!-- Predicción -->
+  <rect x="690" y="260" width="240" height="90" fill="#fadbd8" stroke="#e74c3c" stroke-width="2" rx="5"/>
+  <text x="700" y="280" font-size="11" font-weight="bold" fill="#e74c3c">
+    PREDICCIÓN PARA PRÓXIMO PERÍODO:
+  </text>
+  <text x="810" y="325" font-size="36" font-weight="bold" text-anchor="middle" fill="#e74c3c">
+    305
+  </text>
+  <text x="810" y="350" font-size="11" text-anchor="middle" fill="#e74c3c">
+    unidades
+  </text>
+  
+  <!-- COMPARATIVA GRÁFICA -->
+  <rect x="50" y="420" width="900" height="280" fill="#ecf0f1" rx="10"/>
+  
+  <text x="70" y="450" font-size="16" font-weight="bold" fill="#2c3e50">
+    📊 GRÁFICA COMPARATIVA
+  </text>
+  
+  <!-- Escala de barras -->
+  <!-- Eje X -->
+  <line x1="100" y1="640" x2="900" y2="640" stroke="#34495e" stroke-width="2"/>
+  
+  <!-- Eje Y -->
+  <line x1="100" y1="480" x2="100" y2="640" stroke="#34495e" stroke-width="2"/>
+  
+  <!-- Labels eje Y -->
+  <text x="85" y="645" font-size="10" text-anchor="end" fill="#34495e">0</text>
+  <text x="85" y="590" font-size="10" text-anchor="end" fill="#34495e">250K</text>
+  <text x="85" y="535" font-size="10" text-anchor="end" fill="#34495e">500K</text>
+  <text x="85" y="485" font-size="10" text-anchor="end" fill="#34495e">1M</text>
+  
+  <!-- Grid lines -->
+  <line x1="100" y1="585" x2="900" y2="585" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="100" y1="530" x2="900" y2="530" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- Barras (escaladas: 986,562 máximo) -->
+  <!-- Best-Seller bar: 986562/1000000 * 150 = 148px -->
+  <rect x="200" y="490" width="60" height="150" fill="#27ae60" rx="3"/>
+  <text x="230" y="660" font-size="11" font-weight="bold" text-anchor="middle" fill="#27ae60">
+    Best-Seller
+  </text>
+  <text x="230" y="470" font-size="11" font-weight="bold" text-anchor="middle" fill="#27ae60">
+    986K
+  </text>
+  
+  <!-- Normal bar: 4368/1000000 * 150 = 0.7px (muy pequeño) -->
+  <rect x="420" y="635" width="60" height="5" fill="#3498db" rx="2"/>
+  <text x="450" y="660" font-size="11" font-weight="bold" text-anchor="middle" fill="#3498db">
+    Normal
+  </text>
+  <text x="450" y="627" font-size="11" font-weight="bold" text-anchor="middle" fill="#3498db">
+    4.3K
+  </text>
+  
+  <!-- Slow-moving bar: 305/1000000 * 150 = 0.05px (invisible) -->
+  <rect x="640" y="638" width="60" height="2" fill="#e74c3c" rx="1"/>
+  <text x="670" y="660" font-size="11" font-weight="bold" text-anchor="middle" fill="#e74c3c">
+    Slow-Moving
+  </text>
+  <text x="670" y="632" font-size="11" font-weight="bold" text-anchor="middle" fill="#e74c3c">
+    305
+  </text>
+  
+  <!-- Comparativa de ratios -->
+  <text x="70" y="505" font-size="12" font-weight="bold" fill="#2c3e50">
+    📈 RATIOS DE DIFERENCIA:
+  </text>
+  
+  <rect x="120" y="520" width="150" height="60" fill="white" stroke="#27ae60" stroke-width="2" rx="5"/>
+  <text x="195" y="540" font-size="11" font-weight="bold" text-anchor="middle" fill="#27ae60">
+    Best-Seller vs Normal
+  </text>
+  <text x="195" y="565" font-size="18" font-weight="bold" text-anchor="middle" fill="#27ae60">
+    225.86x
+  </text>
+  
+  <rect x="290" y="520" width="150" height="60" fill="white" stroke="#3498db" stroke-width="2" rx="5"/>
+  <text x="365" y="540" font-size="11" font-weight="bold" text-anchor="middle" fill="#3498db">
+    Normal vs Slow
+  </text>
+  <text x="365" y="565" font-size="18" font-weight="bold" text-anchor="middle" fill="#3498db">
+    14.32x
+  </text>
+  
+  <rect x="460" y="520" width="150" height="60" fill="white" stroke="#e74c3c" stroke-width="2" rx="5"/>
+  <text x="535" y="540" font-size="11" font-weight="bold" text-anchor="middle" fill="#e74c3c">
+    Best-Seller vs Slow
+  </text>
+  <text x="535" y="565" font-size="18" font-weight="bold" text-anchor="middle" fill="#e74c3c">
+    3,233.38x
+  </text>
+  
+  <!-- Tabla resumen -->
+  <text x="70" y="615" font-size="12" font-weight="bold" fill="#2c3e50">
+    📋 RESUMEN DE PREDICCIONES:
+  </text>
+  
+  <!-- Tabla headers -->
+  <line x1="120" y1="635" x2="850" y2="635" stroke="#34495e" stroke-width="2"/>
+  <text x="130" y="655" font-size="11" font-weight="bold" fill="#34495e">Tipo de Producto</text>
+  <text x="350" y="655" font-size="11" font-weight="bold" fill="#34495e">Predicción</text>
+  <text x="550" y="655" font-size="11" font-weight="bold" fill="#34495e">% del Total</text>
+  <text x="750" y="655" font-size="11" font-weight="bold" fill="#34495e">Estado</text>
+  
+  <!-- Tabla rows -->
+  <line x1="120" y1="670" x2="850" y2="670" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="130" y="685" font-size="10" fill="#34495e">🏆 Best-Seller</text>
+  <text x="350" y="685" font-size="10" fill="#27ae60" font-weight="bold">986,562 u</text>
+  <text x="550" y="685" font-size="10" fill="#27ae60" font-weight="bold">99.15%</text>
+  <text x="750" y="685" font-size="10" fill="#27ae60">✅ Crítico</text>
+  
+  <line x1="120" y1="700" x2="850" y2="700" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="130" y="715" font-size="10" fill="#34495e">📦 Normal</text>
+  <text x="350" y="715" font-size="10" fill="#3498db" font-weight="bold">4,368 u</text>
+  <text x="550" y="715" font-size="10" fill="#3498db" font-weight="bold">0.44%</text>
+  <text x="750" y="715" font-size="10" fill="#3498db">✓ OK</text>
+  
+  <line x1="120" y1="730" x2="850" y2="730" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="130" y="745" font-size="10" fill="#34495e">🐢 Slow-Moving</text>
+  <text x="350" y="745" font-size="10" fill="#e74c3c" font-weight="bold">305 u</text>
+  <text x="550" y="745" font-size="10" fill="#e74c3c" font-weight="bold">0.03%</text>
+  <text x="750" y="745" font-size="10" fill="#e74c3c">⚠️ Bajo</text>
+</svg>

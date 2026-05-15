@@ -1,0 +1,68 @@
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+    👥 Dataset de USUARIOS (10 registros)
+  </text>
+  
+  <!-- Dividing line -->
+  <line x1="50" y1="60" x2="750" y2="60" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- Left side: Bar Chart -->
+  <text x="150" y="100" font-size="16" font-weight="bold" fill="#34495e">Distribución de Usuarios</text>
+  
+  <!-- Bar 1: Originales -->
+  <rect x="50" y="130" width="200" height="40" fill="#3498db" rx="5"/>
+  <text x="60" y="160" font-size="14" font-weight="bold" fill="white">Originales</text>
+  <text x="260" y="160" font-size="14" font-weight="bold" fill="#3498db">2</text>
+  
+  <!-- Bar 2: Generados -->
+  <rect x="50" y="190" width="320" height="40" fill="#2ecc71" rx="5"/>
+  <text x="60" y="220" font-size="14" font-weight="bold" fill="white">Generados</text>
+  <text x="380" y="220" font-size="14" font-weight="bold" fill="#2ecc71">8</text>
+  
+  <!-- Pie Chart on right side -->
+  <text x="600" y="100" font-size="16" font-weight="bold" fill="#34495e">Proporción</text>
+  
+  <!-- Pie segments -->
+  <!-- Originales (2/10 = 20%) -->
+  <circle cx="600" cy="200" r="60" fill="none" stroke="#3498db" stroke-width="30" 
+          stroke-dasharray="75.4 251.2" stroke-dashoffset="0"/>
+  
+  <!-- Generados (8/10 = 80%) -->
+  <circle cx="600" cy="200" r="60" fill="none" stroke="#2ecc71" stroke-width="30"
+          stroke-dasharray="201.1 251.2" stroke-dashoffset="-75.4"/>
+  
+  <!-- Pie labels -->
+  <circle cx="600" cy="200" r="60" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+  <text x="610" y="145" font-size="12" font-weight="bold" fill="#3498db">20%</text>
+  <text x="580" y="250" font-size="12" font-weight="bold" fill="#2ecc71">80%</text>
+  
+  <!-- Bottom stats -->
+  <rect x="50" y="300" width="700" height="150" fill="#ecf0f1" rx="10"/>
+  
+  <text x="70" y="330" font-size="14" font-weight="bold" fill="#2c3e50">📊 ESTADÍSTICAS:</text>
+  
+  <text x="70" y="365" font-size="12" fill="#34495e">
+    • Total de usuarios: <tspan font-weight="bold" fill="#2c3e50">10</tspan>
+  </text>
+  
+  <text x="70" y="390" font-size="12" fill="#34495e">
+    • Originales de la BD: <tspan font-weight="bold" fill="#3498db">2</tspan>
+  </text>
+  
+  <text x="70" y="415" font-size="12" fill="#34495e">
+    • Generados automáticamente: <tspan font-weight="bold" fill="#2ecc71">8</tspan>
+  </text>
+  
+  <text x="70" y="440" font-size="12" fill="#34495e">
+    • Roles: Admin, Supervisor, Usuario
+  </text>
+  
+  <!-- Footer -->
+  <text x="400" y="480" font-size="11" text-anchor="middle" fill="#7f8c8d">
+    Dataset generado el 06 de mayo de 2026
+  </text>
+</svg>
