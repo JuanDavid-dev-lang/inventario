@@ -29,13 +29,11 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html
 
 # Copy entire project
-COPY . .
+COPY ./backend/ .
+COPY ./docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
-
-# Copy Apache config
-COPY inventario/docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
 # Expose port
 EXPOSE 80
