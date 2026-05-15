@@ -1,13 +1,22 @@
 steps:
-  # Build single container image with backend + frontend
+  # Debug: Check what's actually in the build context
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args: ['version']
+    
+  # Use git to fetch backend files directly in the build step
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
       - 'gcr.io/$PROJECT_ID/inventario:latest'
+      - '--build-arg'
+      - 'BUILDKIT_INLINE_CACHE=1'
       - '-f'
       - 'Dockerfile'
+      - '--target'
+      - 'production'
       - '.'
+    waitFor: ['-']
 
   # Push image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
