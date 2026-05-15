@@ -1,0 +1,77 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+.eslintcache
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+*.egg-info/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitattributes
+
+# Build files
+/dist
+/build
+.env.local
+.env.*.local
+
+# Testing
+coverage/
+.phpunit.cache/
+
+# Compiled files
+*.class
+*.jar
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Laravel
+/vendor
+.env
+.env.backup
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+
+# Docker
+.docker/
+
+# Backups
+backups/
+*.sql.backup
+
+# Dependencies for frontend build
+frontend/node_modules/
+frontend/dist/
+frontend/.vite-cache/
+
+# Backend
+backend/vendor/
