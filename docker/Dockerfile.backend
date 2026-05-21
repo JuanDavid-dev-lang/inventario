@@ -23,7 +23,9 @@ RUN docker-php-ext-install \
     bcmath
 
 # Enable Apache modules para routing y CORS
-RUN a2enmod rewrite headers
+RUN a2enmod rewrite headers \
+    && echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername
 
 # Copiar configuración personalizada de Apache
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
@@ -46,7 +48,8 @@ RUN chown -R www-data:www-data /var/www/html \
 
 # Copiar script de entrada para configurar el puerto en tiempo de ejecución
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 8080
 

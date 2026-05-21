@@ -34,7 +34,7 @@ steps:
       - '--add-cloudsql-instances'
       - 'noble-return-447622-s1:southamerica-east1:inventario-db'
       - '--set-env-vars'
-      - 'DB_USER=JuanDavid,DB_PASSWORD=Jotaro\,07\,2006,DB_NAME=inventario_db,INSTANCE_CONNECTION_NAME=noble-return-447622-s1:southamerica-east1:inventario-db'
+      - '^|^DB_USER=JuanDavid|DB_PASSWORD=Jotaro,07,2006|DB_NAME=inventario_db|INSTANCE_CONNECTION_NAME=noble-return-447622-s1:southamerica-east1:inventario-db'
 
 images:
   - 'gcr.io/$PROJECT_ID/inventario-api:$SHORT_SHA'
