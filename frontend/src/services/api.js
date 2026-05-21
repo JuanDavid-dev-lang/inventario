@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // URL del backend en Cloud Run
-const API_BASE_URL = 'https://inventario-backend-208277945925.southamerica-east1.run.app'
+const API_BASE_URL = 'https://inventario-api-208277945925.southamerica-east1.run.app'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
