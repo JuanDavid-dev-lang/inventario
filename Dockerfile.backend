@@ -28,11 +28,17 @@ RUN a2enmod rewrite headers
 # Copiar configuración personalizada de Apache
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Set working directory
 WORKDIR /var/www/html
 
 # Copiar el código de la aplicación (el backend completo)
 COPY backend/ .
+
+# Instalar dependencias de PHP
+RUN composer install --no-dev --optimize-autoloader
 
 # Configurar Apache para que escuche en el puerto definido por la variable de entorno PORT
 # Cloud Run asigna esta variable automáticamente (normalmente 8080)
