@@ -1,39 +1,74 @@
 steps:
-  # Debug: Check what's actually in the build context
-  - name: 'gcr.io/cloud-builders/gke-deploy'
-    args: ['version']
-    
-  # Use git to fetch backend files directly in the build step
+  # Build Backend (PHP)
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-backend'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/inventario:latest'
-      - '--build-arg'
-      - 'BUILDKIT_INLINE_CACHE=1'
+      - 'gcr.io/$PROJECT_ID/inventario-backend:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/inventario-backend:$SHORT_SHA'
       - '-f'
-      - 'Dockerfile'
-      - '--target'
-      - 'production'
+      - 'docker/Dockerfile.backend'
       - '.'
-    waitFor: ['-']
 
-  # Push image to Container Registry
+  # Build Frontend (React + Nginx)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/inventario:latest']
-
-  # Deploy to Cloud Run
-  - name: 'gcr.io/cloud-builders/cloud-run'
+    id: 'build-frontend'
     args:
-      - 'deploy'
-      - 'inventario'
-      - '--image=gcr.io/$PROJECT_ID/inventario:latest'
-      - '--region=us-central1'
-      - '--platform=managed'
-      - '--allow-unauthenticated'
-      - '--port=80'
-      - '--memory=1Gi'
-      - '--cpu=2'
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/inventario-frontend:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/inventario-frontend:$SHORT_SHA'
+      - '-f'
+      - 'docker/Dockerfile.frontend'
+      - '.'
 
+  # Push Backend to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-backend'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/inventario-backend:$SHORT_SHA'
+
+  # Push Frontend to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/inventario-frontend:$SHORT_SHA'
+
+  # Deploy Backend to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    id: 'deploy-backend'
+    args:
+      - 'run'
+      - '--filename=.'
+      - '--image=gcr.io/$PROJECT_ID/inventario-backend:$SHORT_SHA'
+      - '--location=southamerica-east1'
+      - '--output=/workspace/backend'
+
+  # Deploy Frontend to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    id: 'deploy-frontend'
+    args:
+      - 'run'
+      - '--filename=.'
+      - '--image=gcr.io/$PROJECT_ID/inventario-frontend:$SHORT_SHA'
+      - '--location=southamerica-east1'
+      - '--output=/workspace/frontend'
+
+# Push images to Container Registry
 images:
-  - 'gcr.io/$PROJECT_ID/inventario:latest'
+  - 'gcr.io/$PROJECT_ID/inventario-backend:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/inventario-frontend:$SHORT_SHA'
+
+# Build timeout
+timeout: 3600s
+
+# Substitutions for environment
+substitutions:
+  _REGION: 'southamerica-east1'
+  _BACKEND_SERVICE: 'inventario-backend'
+  _FRONTEND_SERVICE: 'inventario-frontend'

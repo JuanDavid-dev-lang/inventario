@@ -1,20 +1,20 @@
-﻿<?php
+<?php
 // public/index.php - Front Controller
 define('ROOT', dirname(dirname(__FILE__)));
+require_once ROOT . '/vendor/autoload.php';
+use Firebase\JWT\JWT;
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json');
-if (['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit(); }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit(); }
 try {
     $db_config = require_once ROOT . '/config/database.php';
     $pdo = $db_config['pdo'];
-    require_once ROOT . '/vendor/autoload.php';
-    use Firebase\JWT\JWT;
-    $request_path = ['REQUEST_URI'];
-    if (strpos($request_path, '?') !== false) { $request_path = parse_url($request_path, PHP_URL_QUERY); }
+    $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $request_path = '/' . trim($request_path, '/');
-    $method = ['REQUEST_METHOD'];
+    $method = $_SERVER['REQUEST_METHOD'];
     if ($request_path === '/auth/login' && $method === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
         if (!isset($input['email']) || !isset($input['password'])) { http_response_code(400); echo json_encode(['error' => 'email and password required']); exit(); }

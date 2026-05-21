@@ -6,7 +6,7 @@
 
 try {
     // Cargar configuración de base de datos
-    $db_config = require_once __DIR__ . '/config/database.php';
+    $db_config = require_once dirname(__DIR__) . '/config/database.php';
     $pdo = $db_config['pdo'];
     
     // SQL para crear tablas
