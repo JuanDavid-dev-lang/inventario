@@ -1,13 +1,13 @@
 <?php
 // public/index.php - Front Controller (MVC Entry Point)
 
-// CORS Headers - MUST be first
+// CORS Headers - MUST be first (before any output)
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json');
 
-// Handle preflight request
+// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
@@ -23,12 +23,19 @@ $pdo = $config['pdo'];
 
 // Route handling
 $request_method = $_SERVER['REQUEST_METHOD'];
-$request_uri = $_SERVER['REQUEST_URI'];
 
-// Parse path, removing query string and handling both /path and ?/path formats
-$path = parse_url($request_uri, PHP_URL_PATH);
+// Get the path from REQUEST_URI
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Remove leading /index.php if present
 $path = str_replace('/index.php', '', $path);
-$path = rtrim($path, '/') ?: '/';
+
+// Normalize the path
+$path = '/' . ltrim($path, '/');
+$path = rtrim($path, '/');
+if (empty($path)) {
+    $path = '/';
+}
 
 // Simple routing
 if (preg_match('#^/auth/login$#', $path) && $request_method === 'POST') {
@@ -86,6 +93,6 @@ if (preg_match('#^/auth/login$#', $path) && $request_method === 'POST') {
     exit;
 } else {
     http_response_code(404);
-    echo json_encode(['error' => 'Not Found', 'path' => $path]);
+    echo json_encode(['error' => 'Not Found']);
     exit;
 }
