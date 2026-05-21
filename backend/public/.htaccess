@@ -1,3 +1,11 @@
+<IfModule mod_headers.c>
+    # Habilitar CORS para todas las solicitudes (ajustar para producción)
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Origin"
+    Header set Access-Control-Max-Age "3600"
+</IfModule>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /

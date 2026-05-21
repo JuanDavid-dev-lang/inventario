@@ -1,24 +1,5 @@
 ﻿<?php
 
-// ---- CORS Headers ----
-
-// Obtener el origen de la solicitud
-$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
-
-// Permitir el origen si es una URL específica (cambiar por el dominio de tu frontend en prod)
-// O usar '*' para permitir cualquier origen (menos seguro, pero útil para depuración)
-header("Access-Control-Allow-Origin: $origin");
-header('Access-Control-Allow-Credentials: true'); // Si usas cookies/sesiones con CORS
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin');
-header('Access-Control-Max-Age: 3600'); // Cache preflight requests por 1 hora
-
-// Manejar preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
 // public/index.php — Front Controller (MVC Entry Point)
 
 define('ROOT', dirname(dirname(__FILE__)));
