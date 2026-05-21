@@ -12,7 +12,7 @@ $instance_connection_name = getenv('INSTANCE_CONNECTION_NAME') ?: 'noble-return-
 $db_socket = $socket_dir . '/' . $instance_connection_name;
 $db_user = getenv('DB_USER') ?: 'JuanDavid';
 $db_password = getenv('DB_PASSWORD') ?: 'Jotaro,07,2006';
-$db_name = getenv('DB_NAME') ?: 'inventario';
+$db_name = getenv('DB_NAME') ?: 'inventario_db';
 
 // Crear conexión usando PDO (es más robusto para sockets)
 try {

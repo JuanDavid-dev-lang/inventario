@@ -1,6 +1,6 @@
 -- Crear la base de datos
-CREATE DATABASE IF NOT EXISTS inventario;
-USE inventario;
+CREATE DATABASE IF NOT EXISTS inventario_db;
+USE inventario_db;
 
 -- Crear tabla de usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
