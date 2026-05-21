@@ -5,15 +5,65 @@ require_once ROOT . '/vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-header('Access-Control-Allow-Origin: ' . $origin);
-header('Vary: Origin');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-header('Access-Control-Max-Age: 86400');
-header('Content-Type: application/json; charset=utf-8');
+$defaultAllowedOrigins = [
+    'https://inventario-frontend-208277945925.southamerica-east1.run.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:8080',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:8080',
+];
+
+function configured_origins(array $defaults): array
+{
+    $configured = getenv('CORS_ALLOWED_ORIGINS') ?: getenv('FRONTEND_URL') ?: '';
+    $origins = array_filter(array_map('trim', explode(',', $configured)));
+
+    return array_values(array_unique(array_merge($defaults, $origins)));
+}
+
+function apply_cors_headers(array $allowedOrigins): bool
+{
+    $requestOrigin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $hasOrigin = $requestOrigin !== '';
+    $originAllowed = !$hasOrigin
+        || in_array('*', $allowedOrigins, true)
+        || in_array($requestOrigin, $allowedOrigins, true)
+        || (bool) preg_match('#^https://inventario-frontend-[a-z0-9-]+\.southamerica-east1\.run\.app$#i', $requestOrigin);
+
+    foreach ([
+        'Access-Control-Allow-Origin',
+        'Access-Control-Allow-Methods',
+        'Access-Control-Allow-Headers',
+        'Access-Control-Max-Age',
+    ] as $header) {
+        header_remove($header);
+    }
+
+    if (!$hasOrigin) {
+        header('Access-Control-Allow-Origin: *', true);
+    } elseif ($originAllowed) {
+        header('Access-Control-Allow-Origin: ' . $requestOrigin, true);
+    }
+
+    header('Vary: Origin', true);
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS', true);
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin', true);
+    header('Access-Control-Max-Age: 86400', true);
+
+    return $originAllowed;
+}
+
+$corsAllowed = apply_cors_headers(configured_origins($defaultAllowedOrigins));
+header('Content-Type: application/json; charset=utf-8', true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if (!$corsAllowed) {
+        http_response_code(403);
+        exit;
+    }
+
     http_response_code(204);
     exit;
 }

@@ -54,3 +54,4 @@ RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
 EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["apache2-foreground"]
