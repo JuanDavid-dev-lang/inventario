@@ -1,5 +1,5 @@
 <?php
-// public/index.php — Front Controller (MVC Entry Point)
+// public/index.php - Front Controller (MVC Entry Point)
 
 define('ROOT', dirname(dirname(__FILE__)));
 
@@ -7,29 +7,14 @@ require ROOT . '/vendor/autoload.php';
 
 // Database connection
 $config = require ROOT . '/config/database.php';
-
-try {
-    $pdo = new PDO(
-        "mysql:host={$config['host']};dbname={$config['database']};port={$config['port']}",
-        $config['user'],
-        $config['password'],
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Connection failed PDO',
-        'message' => $e->getMessage()
-    ]);
-    exit;
-}
+$pdo = $config['pdo'];
 
 // Route handling
 $request_method = $_SERVER['REQUEST_METHOD'];
 $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $request_path = str_replace('/index.php', '', $request_path);
 
-// Simple routing (can be expanded)
+// Simple routing
 if (preg_match('#^/auth/login$#', $request_path) && $request_method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     
