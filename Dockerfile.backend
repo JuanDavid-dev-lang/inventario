@@ -40,16 +40,14 @@ COPY backend/ .
 # Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Configurar Apache para que escuche en el puerto definido por la variable de entorno PORT
-# Cloud Run asigna esta variable automáticamente (normalmente 8080)
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
 # Ajustar permisos para Apache
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Exponer el puerto (aunque en Cloud Run se sobreescribe)
+# Copiar script de entrada para configurar el puerto en tiempo de ejecución
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 EXPOSE 8080
 
-# Iniciar Apache en foreground
-CMD ["apache2-foreground"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
