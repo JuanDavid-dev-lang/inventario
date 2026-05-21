@@ -1,337 +1,90 @@
-﻿<?php
-// ---- STRICT CORS HANDLING ----
-$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '*';
-header("Access-Control-Allow-Origin: $origin");
-header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin, Accept");
-header("Access-Control-Max-Age: 86400"); // Cache preflight requests por 24 horas
-
-// Si es una petición OPTIONS (preflight de CORS), salir inmediatamente con éxito
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200); // o 204
-    exit(0);
-}
-
+<?php
 // public/index.php — Front Controller (MVC Entry Point)
 
 define('ROOT', dirname(dirname(__FILE__)));
-// Detectar BASE_URL basado en el entorno
-if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost:8000') !== false) {
-    // Entorno de desarrollo con Vite proxy
-    define('BASE_URL', '');
-} else {
-    // Entorno de producción
-    define('BASE_URL', '/inventario/public');
-}
 
-// Autoload Composer
 require ROOT . '/vendor/autoload.php';
 
-// Configuración
-require ROOT . '/config/database.php';
-require ROOT . '/config/jwt.php';
+// Database connection
+$config = require ROOT . '/config/database.php';
 
-// Controladores
-require ROOT . '/app/controllers/AuthController.php';
-require ROOT . '/app/controllers/ProductoController.php';
-require ROOT . '/app/controllers/MovimientoController.php';
-require ROOT . '/app/controllers/ReporteController.php';
-require ROOT . '/app/controllers/PrediccionController.php';
-require ROOT . '/app/controllers/UsuariosController.php';
+try {
+    $pdo = new PDO(
+        "mysql:host={$config['host']};dbname={$config['database']};port={$config['port']}",
+        $config['user'],
+        $config['password'],
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Connection failed PDO',
+        'message' => $e->getMessage()
+    ]);
+    exit;
+}
 
-// Modelos
-require ROOT . '/app/models/Usuario.php';
-require ROOT . '/app/models/Producto.php';
-require ROOT . '/app/models/Movimiento.php';
-require ROOT . '/app/models/Venta.php';
-require ROOT . '/app/models/Alerta.php';
+// Route handling
+$request_method = $_SERVER['REQUEST_METHOD'];
+$request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$request_path = str_replace('/index.php', '', $request_path);
 
-// ---- Router ----
-$uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri    = str_replace(BASE_URL, '', $uri);
-$uri    = trim($uri, '/');
-// Remove /api prefix if present (for frontend compatibility)
-$uri    = preg_replace('|^api/|', '', $uri);
-$method = $_SERVER['REQUEST_METHOD'];
-
-// Debug: Log the URI being processed
-// error_log("Processed URI: $uri from REQUEST_URI: {$_SERVER['REQUEST_URI']}, BASE_URL: " . BASE_URL);
-
-// Rutas públicas (sin JWT)
-$rutasPublicas = ['', 'login', 'auth/login'];
-
-// Verificar autenticación para rutas protegidas
-if (!in_array($uri, $rutasPublicas)) {
-    $token = JWTHelper::obtenerTokenDeHeader();
-    $user  = $token ? JWTHelper::validarToken($token) : null;
-    if (!$user) {
-        // Si es petición AJAX (desde JavaScript fetch) o navegador
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            // AJAX o con header Authorization
-            http_response_code(401);
-            echo json_encode(['error' => 'No autorizado']);
-            exit;
-        }
-        // Petición desde navegador normal - redirigir al login
-        header('Location: ' . BASE_URL . '/login');
+// Simple routing (can be expanded)
+if (preg_match('#^/auth/login$#', $request_path) && $request_method === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    $email = $input['email'] ?? null;
+    $password = $input['password'] ?? null;
+    
+    if (!$email || !$password) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Email and password required']);
         exit;
     }
-}
-
-// ---- Despacho de rutas ----
-switch (true) {
-
-    // Auth
-    case ($uri === '' || $uri === 'login') && $method === 'GET':
-        (new AuthController())->mostrarLogin();
-        break;
-    case $uri === 'auth/login' && $method === 'POST':
-        (new AuthController())->login();
-        break;
-    case $uri === 'auth/logout' && $method === 'POST':
-        (new AuthController())->logout();
-        break;
-    case $uri === 'auth/perfil' && $method === 'GET':
-        (new AuthController())->obtenerPerfil();
-        break;
-
-    // Dashboard
-    case $uri === 'dashboard':
-        (new ReporteController())->dashboard();
-        break;
-
-    // Productos
-    case $uri === 'productos' && $method === 'GET':
-        (new ProductoController())->index();
-        break;
-    case $uri === 'productos/crear' && $method === 'GET':
-        (new ProductoController())->mostrarCrear();
-        break;
-    case $uri === 'productos/crear' && $method === 'POST':
-        (new ProductoController())->crear();
-        break;
-    case preg_match('/^productos\/(\d+)\/editar$/', $uri, $m) && $method === 'GET':
-        (new ProductoController())->mostrarEditar((int)$m[1]);
-        break;
-    case preg_match('/^productos\/(\d+)\/editar$/', $uri, $m) && $method === 'POST':
-        (new ProductoController())->editar((int)$m[1]);
-        break;
-    case preg_match('/^productos\/(\d+)\/eliminar$/', $uri, $m) && $method === 'POST':
-        (new ProductoController())->eliminar((int)$m[1]);
-        break;
-    case $uri === 'productos/importar' && $method === 'POST':
-        (new ProductoController())->importarExcel();
-        break;
-
-    // Movimientos
-    case $uri === 'movimientos' && $method === 'GET':
-        (new MovimientoController())->index();
-        break;
-    case $uri === 'movimientos/registrar' && $method === 'POST':
-        (new MovimientoController())->registrar();
-        break;
-
-    // Reportes
-    case $uri === 'reportes' && $method === 'GET':
-        (new ReporteController())->index();
-        break;
-    case $uri === 'reportes/datos' && $method === 'GET':
-        (new ReporteController())->datos();
-        break;
-    case $uri === 'reportes/alerta-leida' && $method === 'POST':
-        (new ReporteController())->marcarAlertaLeida();
-        break;
-    case $uri === 'reportes/ignorar-alerta-critica' && $method === 'POST':
-        (new ReporteController())->ignorarAlertaCritica();
-        break;
-    case $uri === 'reportes/exportar-excel' && $method === 'GET':
-        (new ReporteController())->exportarExcel();
-        break;
-
-    // Predicción de demanda
-    case $uri === 'prediccion' && $method === 'GET':
-        (new PrediccionController())->index();
-        break;
-    case $uri === 'prediccion/calcular' && $method === 'GET':
-        (new PrediccionController())->calcular();
-        break;
-    case $uri === 'prediccion/analisis' && $method === 'GET':
-        (new PrediccionController())->analisisGeneral();
-        break;
-    case $uri === 'prediccion/analisis-original' && $method === 'GET':
-        (new PrediccionController())->analisisOriginal();
-        break;
-
-    // Usuarios (solo admin)
-    case $uri === 'usuarios' && $method === 'GET':
-        (new UsuariosController())->index();
-        break;
-    case $uri === 'usuarios/crear' && $method === 'POST':
-        (new UsuariosController())->crear();
-        break;
-    case preg_match('#^usuarios/([0-9]+)/editar$#', $uri, $m) && $method === 'POST':
-        (new UsuariosController())->editar($m[1]);
-        break;
-    case preg_match('#^usuarios/([0-9]+)/eliminar$#', $uri, $m) && $method === 'POST':
-        (new UsuariosController())->eliminar($m[1]);
-        break;
-
-    // 404
-    default:
-        http_response_code(404);
-        echo "<h1>404 — Página no encontrada</h1>";
-        break;
-}
-
-// Controladores
-require ROOT . '/app/controllers/AuthController.php';
-require ROOT . '/app/controllers/ProductoController.php';
-require ROOT . '/app/controllers/MovimientoController.php';
-require ROOT . '/app/controllers/ReporteController.php';
-require ROOT . '/app/controllers/PrediccionController.php';
-require ROOT . '/app/controllers/UsuariosController.php';
-
-// Modelos
-require ROOT . '/app/models/Usuario.php';
-require ROOT . '/app/models/Producto.php';
-require ROOT . '/app/models/Movimiento.php';
-require ROOT . '/app/models/Venta.php';
-require ROOT . '/app/models/Alerta.php';
-
-// ---- Router ----
-$uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri    = str_replace(BASE_URL, '', $uri);
-$uri    = trim($uri, '/');
-// Remove /api prefix if present (for frontend compatibility)
-$uri    = preg_replace('|^api/|', '', $uri);
-$method = $_SERVER['REQUEST_METHOD'];
-
-// Debug: Log the URI being processed
-// error_log("Processed URI: $uri from REQUEST_URI: {$_SERVER['REQUEST_URI']}, BASE_URL: " . BASE_URL);
-
-// Rutas públicas (sin JWT)
-$rutasPublicas = ['', 'login', 'auth/login'];
-
-// Verificar autenticación para rutas protegidas
-if (!in_array($uri, $rutasPublicas)) {
-    $token = JWTHelper::obtenerTokenDeHeader();
-    $user  = $token ? JWTHelper::validarToken($token) : null;
-    if (!$user) {
-        // Si es petición AJAX (desde JavaScript fetch) o navegador
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) || isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            // AJAX o con header Authorization
-            http_response_code(401);
-            echo json_encode(['error' => 'No autorizado']);
-            exit;
-        }
-        // Petición desde navegador normal - redirigir al login
-        header('Location: ' . BASE_URL . '/login');
+    
+    // Mock login for now (in production, query the database)
+    if ($email === 'admin@inventario.com' && $password === 'admin123') {
+        $secret = 'tu_clave_secreta_jwt_aqui'; // TODO: Use environment variables
+        $payload = [
+            'iss' => 'inventario-api',
+            'aud' => 'inventario-frontend',
+            'iat' => time(),
+            'exp' => time() + 86400, // 24 hours
+            'email' => $email,
+            'role' => 'admin'
+        ];
+        
+        $token = \Firebase\JWT\JWT::encode($payload, $secret, 'HS256');
+        
+        http_response_code(200);
+        echo json_encode([
+            'token' => $token,
+            'user' => [
+                'email' => $email,
+                'role' => 'admin'
+            ]
+        ]);
+        exit;
+    } else {
+        http_response_code(401);
+        echo json_encode(['error' => 'Invalid credentials']);
         exit;
     }
-}
-
-// ---- Despacho de rutas ----
-switch (true) {
-
-    // Auth
-    case ($uri === '' || $uri === 'login') && $method === 'GET':
-        (new AuthController())->mostrarLogin();
-        break;
-    case $uri === 'auth/login' && $method === 'POST':
-        (new AuthController())->login();
-        break;
-    case $uri === 'auth/logout' && $method === 'POST':
-        (new AuthController())->logout();
-        break;
-    case $uri === 'auth/perfil' && $method === 'GET':
-        (new AuthController())->obtenerPerfil();
-        break;
-
-    // Dashboard
-    case $uri === 'dashboard':
-        (new ReporteController())->dashboard();
-        break;
-
-    // Productos
-    case $uri === 'productos' && $method === 'GET':
-        (new ProductoController())->index();
-        break;
-    case $uri === 'productos/crear' && $method === 'GET':
-        (new ProductoController())->mostrarCrear();
-        break;
-    case $uri === 'productos/crear' && $method === 'POST':
-        (new ProductoController())->crear();
-        break;
-    case preg_match('/^productos\/(\d+)\/editar$/', $uri, $m) && $method === 'GET':
-        (new ProductoController())->mostrarEditar((int)$m[1]);
-        break;
-    case preg_match('/^productos\/(\d+)\/editar$/', $uri, $m) && $method === 'POST':
-        (new ProductoController())->editar((int)$m[1]);
-        break;
-    case preg_match('/^productos\/(\d+)\/eliminar$/', $uri, $m) && $method === 'POST':
-        (new ProductoController())->eliminar((int)$m[1]);
-        break;
-    case $uri === 'productos/importar' && $method === 'POST':
-        (new ProductoController())->importarExcel();
-        break;
-
-    // Movimientos
-    case $uri === 'movimientos' && $method === 'GET':
-        (new MovimientoController())->index();
-        break;
-    case $uri === 'movimientos/registrar' && $method === 'POST':
-        (new MovimientoController())->registrar();
-        break;
-
-    // Reportes
-    case $uri === 'reportes' && $method === 'GET':
-        (new ReporteController())->index();
-        break;
-    case $uri === 'reportes/datos' && $method === 'GET':
-        (new ReporteController())->datos();
-        break;
-    case $uri === 'reportes/alerta-leida' && $method === 'POST':
-        (new ReporteController())->marcarAlertaLeida();
-        break;
-    case $uri === 'reportes/ignorar-alerta-critica' && $method === 'POST':
-        (new ReporteController())->ignorarAlertaCritica();
-        break;
-    case $uri === 'reportes/exportar-excel' && $method === 'GET':
-        (new ReporteController())->exportarExcel();
-        break;
-
-    // Predicción de demanda
-    case $uri === 'prediccion' && $method === 'GET':
-        (new PrediccionController())->index();
-        break;
-    case $uri === 'prediccion/calcular' && $method === 'GET':
-        (new PrediccionController())->calcular();
-        break;
-    case $uri === 'prediccion/analisis' && $method === 'GET':
-        (new PrediccionController())->analisisGeneral();
-        break;
-    case $uri === 'prediccion/analisis-original' && $method === 'GET':
-        (new PrediccionController())->analisisOriginal();
-        break;
-
-    // Usuarios (solo admin)
-    case $uri === 'usuarios' && $method === 'GET':
-        (new UsuariosController())->index();
-        break;
-    case $uri === 'usuarios/crear' && $method === 'POST':
-        (new UsuariosController())->crear();
-        break;
-    case preg_match('#^usuarios/([0-9]+)/editar$#', $uri, $m) && $method === 'POST':
-        (new UsuariosController())->editar($m[1]);
-        break;
-    case preg_match('#^usuarios/([0-9]+)/eliminar$#', $uri, $m) && $method === 'POST':
-        (new UsuariosController())->eliminar($m[1]);
-        break;
-
-    // 404
-    default:
-        http_response_code(404);
-        echo "<h1>404 — Página no encontrada</h1>";
-        break;
+} elseif (preg_match('#^/api/productos$#', $request_path) && $request_method === 'GET') {
+    // Get all products
+    try {
+        $stmt = $pdo->query('SELECT * FROM productos');
+        $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        http_response_code(200);
+        echo json_encode($productos);
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    exit;
+} else {
+    http_response_code(404);
+    echo json_encode(['error' => 'Not Found']);
+    exit;
 }
