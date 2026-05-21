@@ -1,5 +1,19 @@
 ﻿<?php
 
+// ---- STRICT CORS HANDLING ----
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '*';
+header("Access-Control-Allow-Origin: $origin");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Origin, Accept");
+header("Access-Control-Max-Age: 86400"); // Cache preflight requests por 24 horas
+
+// Si es una petición OPTIONS (preflight de CORS), salir inmediatamente con éxito
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200); // o 204
+    exit(0);
+}
+
 // public/index.php — Front Controller (MVC Entry Point)
 
 define('ROOT', dirname(dirname(__FILE__)));
