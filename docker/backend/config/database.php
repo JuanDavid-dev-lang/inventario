@@ -10,6 +10,9 @@ $db_user = getenv('DB_USER') ?: 'JuanDavid';
 $db_password = getenv('DB_PASSWORD') ?: 'Jotaro,07,2006';
 $db_name = getenv('DB_NAME') ?: 'inventario_db';
 $instance_connection_name = getenv('INSTANCE_CONNECTION_NAME') ?: '';
+if ($instance_connection_name === '' && getenv('K_SERVICE')) {
+    $instance_connection_name = 'noble-return-447622-s1:southamerica-east1:inventario-db';
+}
 
 // Si el host o el socket está en Cloud Run, configurar el socket de Cloud SQL
 $db_socket = null;
