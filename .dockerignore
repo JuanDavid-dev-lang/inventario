@@ -2,6 +2,7 @@
 
 # Node modules
 node_modules/
+**/node_modules/
 npm-debug.log
 yarn-error.log
 .npm
@@ -36,6 +37,7 @@ htmlcov/
 # Build files
 /dist
 /build
+frontend/dist/
 .env.local
 .env.*.local
 

@@ -10,8 +10,8 @@ WORKDIR /app
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install all dependencies needed by Vite during the build stage
+RUN npm ci --include=dev
 
 # Copy source code
 COPY frontend/ ./

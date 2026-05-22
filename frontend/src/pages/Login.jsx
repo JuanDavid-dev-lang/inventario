@@ -159,7 +159,7 @@ const Login = () => {
           <hr style={{ margin: '2rem 0', borderColor: '#e2e8f0' }} />
 
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>
-            Demo: <strong>admin@ejemplo.com</strong> / <strong>password123</strong>
+            Demo: <strong>admin@inventario.com</strong> / <strong>admin123</strong>
           </p>
         </div>
       </div>
