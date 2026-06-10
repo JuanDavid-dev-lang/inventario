@@ -41,10 +41,16 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null)
       const response = await authService.login(email, password)
+      const usuario = response.data.usuario || response.data.user
+
+      if (!response.data.token || !usuario) {
+        throw new Error('Respuesta de login incompleta')
+      }
+
       localStorage.setItem('adminToken', response.data.token)
-      localStorage.setItem('usuario', JSON.stringify(response.data.usuario))
-      setUsuario(response.data.usuario)
-      return response.data
+      localStorage.setItem('usuario', JSON.stringify(usuario))
+      setUsuario(usuario)
+      return { ...response.data, usuario }
     } catch (err) {
       const mensaje = err.response?.data?.error || 'Error al iniciar sesión'
       setError(mensaje)

@@ -1,8 +1,5 @@
-# Docker build ignore file
-
 # Node modules
 node_modules/
-**/node_modules/
 npm-debug.log
 yarn-error.log
 .npm
@@ -31,13 +28,11 @@ htmlcov/
 
 # Git
 .git/
-.gitignore
 .gitattributes
 
 # Build files
 /dist
 /build
-frontend/dist/
 .env.local
 .env.*.local
 
@@ -52,3 +47,31 @@ coverage/
 # Logs
 *.log
 logs/
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Laravel
+/vendor
+.env
+.env.backup
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+
+# Docker
+.docker/
+
+# Backups
+backups/
+*.sql.backup
+
+# Dependencies for frontend build
+frontend/node_modules/
+frontend/dist/
+frontend/.vite-cache/
+
+# Backend
+backend/vendor/

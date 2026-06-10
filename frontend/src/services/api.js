@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_BASE_URL = '/api'
+// URL del backend en Cloud Run
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://inventario-api-208277945925.southamerica-east1.run.app'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -26,8 +27,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url || ''
+    const isLoginRequest = requestUrl.includes('/auth/login')
+
+    if (error.response?.status === 401 && !isLoginRequest) {
       localStorage.removeItem('adminToken')
+      localStorage.removeItem('usuario')
       window.location.href = '/login'
     }
     return Promise.reject(error)

@@ -1,0 +1,19 @@
+{
+    "name": "inventario/backend",
+    "description": "Backend para el sistema de inventario",
+    "type": "project",
+    "require": {
+        "php": ">=8.0",
+        "firebase/php-jwt": "*"
+    },
+    "config": {
+        "audit": {
+            "block-insecure": false
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}
