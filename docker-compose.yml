@@ -108,6 +108,33 @@ services:
       timeout: 5s
       retries: 5
 
+  # Notification Service (Email)
+  notification-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.notification
+    container_name: inventario-notification
+    environment:
+      EMAIL_USER: tu-correo@gmail.com
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      RECIPIENT_EMAIL: tu-correo@gmail.com
+      DB_HOST: mysql
+      DB_USER: inventario
+      DB_PASSWORD: password123
+      DB_NAME: inventario_db
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   mysql_data:
 

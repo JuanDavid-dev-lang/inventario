@@ -8,13 +8,13 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY inventario/frontend/package*.json ./
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy source code
-COPY inventario/frontend/ ./
+COPY frontend/ ./
 
 # Build for production
 RUN npm run build

@@ -1,0 +1,15 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/$PROJECT_ID/inventario-backend:$SHORT_SHA',
+        '-f',
+        'docker/Dockerfile.backend',
+        '.'
+      ]
+images:
+  - 'gcr.io/$PROJECT_ID/inventario-backend:$SHORT_SHA'
+options:
+  substitution_option: ALLOW_LOOSE
