@@ -6,10 +6,10 @@ services:
     image: mysql:8.0
     container_name: inventario-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?define DB_ROOT_PASSWORD en .env}
       MYSQL_DATABASE: inventario_db
       MYSQL_USER: inventario
-      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?define DB_PASSWORD en .env}
     ports:
       - "3306:3306"
     volumes:
@@ -30,7 +30,7 @@ services:
     environment:
       PMA_HOST: mysql
       PMA_USER: inventario
-      PMA_PASSWORD: ${DB_PASSWORD:-password123}
+      PMA_PASSWORD: ${DB_PASSWORD:?define DB_PASSWORD en .env}
       PMA_ROOT_PASSWORD: root
     ports:
       - "8081:80"
@@ -48,7 +48,7 @@ services:
     environment:
       DB_HOST: mysql
       DB_USER: inventario
-      DB_PASSWORD: ${DB_PASSWORD:-password123}
+      DB_PASSWORD: ${DB_PASSWORD:?define DB_PASSWORD en .env}
       DB_NAME: inventario_db
       # Required: the API refuses to issue tokens without it. Generate one per
       # installation with `openssl rand -hex 32` and put it in .env — two shops
@@ -127,7 +127,7 @@ services:
       RECIPIENT_EMAIL: tu-correo@gmail.com
       DB_HOST: mysql
       DB_USER: inventario
-      DB_PASSWORD: ${DB_PASSWORD:-password123}
+      DB_PASSWORD: ${DB_PASSWORD:?define DB_PASSWORD en .env}
       DB_NAME: inventario_db
       PORT: 3001
     ports:

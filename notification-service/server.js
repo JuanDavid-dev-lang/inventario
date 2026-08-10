@@ -20,7 +20,9 @@ const transporter = nodemailer.createTransport({
 const dbConfig = {
   host: process.env.DB_HOST || 'mysql',
   user: process.env.DB_USER || 'inventario',
-  password: process.env.DB_PASSWORD || 'password123',
+  // Sin valor por defecto a proposito: un respaldo literal es una credencial
+  // compartida por todas las instalaciones esperando a que alguien la use.
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || 'inventario_db',
   waitForConnections: true,
   connectionLimit: 10,

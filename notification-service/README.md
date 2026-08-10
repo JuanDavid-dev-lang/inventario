@@ -28,7 +28,7 @@ EMAIL_PASSWORD=xxxx xxxx xxxx xxxx  # Contraseña de aplicación de Google
 RECIPIENT_EMAIL=tu-correo@gmail.com
 DB_HOST=mysql
 DB_USER=inventario
-DB_PASSWORD=password123
+DB_PASSWORD=tu-clave-de-base-de-datos
 DB_NAME=inventario_db
 PORT=3001
 ```
@@ -172,7 +172,7 @@ notification-service:
     RECIPIENT_EMAIL: tu-correo@gmail.com
     DB_HOST: mysql
     DB_USER: inventario
-    DB_PASSWORD: password123
+    DB_PASSWORD: ${DB_PASSWORD}
     DB_NAME: inventario_db
     PORT: 3001
   ports:
