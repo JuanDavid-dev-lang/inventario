@@ -4,6 +4,7 @@ define('ROOT', dirname(__DIR__));
 require_once ROOT . '/vendor/autoload.php';
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 $defaultAllowedOrigins = [
     'https://inventario-frontend-208277945925.southamerica-east1.run.app',
@@ -82,46 +83,68 @@ function body(): array
     return is_array($decoded) ? $decoded : $_POST;
 }
 
-function is_demo_admin_login(string $email, string $password): bool
+/**
+ * Reads the signing secret, refusing to issue tokens without one.
+ *
+ * This used to fall back to a hard-coded string when JWT_SECRET was unset.
+ * Anyone who could read this file could then forge a valid admin token for the
+ * deployed instance, so there is no safe default and the request fails instead.
+ */
+function jwt_secret(): string
 {
-    $demoEmails = ['admin@inventario.com', 'admin@ejemplo.com', 'admin@test.com'];
-    $demoPasswords = ['admin123', 'password123'];
+    $secret = getenv('JWT_SECRET') ?: '';
 
-    return in_array(strtolower($email), $demoEmails, true) && in_array($password, $demoPasswords, true);
-}
-
-function admin_user_for_demo_login(PDO $pdo, string $email, string $password): ?array
-{
-    $stmt = $pdo->prepare(
-        "SELECT * FROM usuarios
-         WHERE email IN ('admin@inventario.com', 'admin@ejemplo.com', 'admin@test.com')
-            OR rol = 'admin'
-         ORDER BY CASE
-             WHEN email = ? THEN 0
-             WHEN email = 'admin@inventario.com' THEN 1
-             WHEN rol = 'admin' THEN 2
-             ELSE 3
-         END
-         LIMIT 1"
-    );
-    $stmt->execute([$email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user) {
-        return $user;
+    if (strlen($secret) < 32) {
+        error_log('JWT_SECRET is missing or shorter than 32 characters; refusing to issue tokens.');
+        respond(['error' => 'Server misconfigured'], 500);
     }
 
-    $id = insert_for_existing_columns($pdo, 'usuarios', [
-        'nombre' => 'Admin',
-        'email' => $email,
-        'password' => password_hash($password, PASSWORD_BCRYPT),
-        'rol' => 'admin',
-        'activo' => true,
-    ]);
+    return $secret;
+}
 
-    $stmt = $pdo->prepare('SELECT * FROM usuarios WHERE id = ? LIMIT 1');
-    $stmt->execute([$id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+/**
+ * Requires a valid bearer token and returns its claims.
+ *
+ * Before this existed the API issued tokens and then never looked at one again:
+ * every route past /auth/login answered unauthenticated requests, so
+ * `GET /usuarios` handed out the user table and `DELETE /usuarios/{id}` worked
+ * for anyone who could reach the host.
+ */
+function require_auth(): array
+{
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+
+    if ($header === '' && function_exists('getallheaders')) {
+        foreach (getallheaders() as $name => $value) {
+            if (strcasecmp($name, 'Authorization') === 0) {
+                $header = $value;
+                break;
+            }
+        }
+    }
+
+    if (!preg_match('/^Bearer\s+(.+)$/i', trim($header), $matches)) {
+        respond(['error' => 'Unauthorized'], 401);
+    }
+
+    try {
+        // Algorithm pinned to HS256. Trusting the token's own "alg" header is
+        // how the classic "alg: none" forgery gets in.
+        $claims = (array) JWT::decode($matches[1], new Key(jwt_secret(), 'HS256'));
+    } catch (Throwable $error) {
+        respond(['error' => 'Unauthorized'], 401);
+    }
+
+    return $claims;
+}
+
+function require_admin(): array
+{
+    $claims = require_auth();
+    if (($claims['rol'] ?? '') !== 'admin') {
+        respond(['error' => 'Forbidden'], 403);
+    }
+    return $claims;
 }
 
 function path(): string
@@ -288,19 +311,23 @@ try {
         $stmt = $pdo->prepare('SELECT * FROM usuarios WHERE email = ? LIMIT 1');
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        $demoLogin = is_demo_admin_login($email, $password);
 
-        if (!$user && $demoLogin) {
-            $user = admin_user_for_demo_login($pdo, $email, $password);
-        }
-
-        $valid = $user && (
-            password_verify($password, $user['password']) ||
-            hash_equals((string) $user['password'], $password) ||
-            ($demoLogin && ($user['rol'] ?? '') === 'admin')
-        );
+        // The only accepted proof is a password that verifies against the stored
+        // bcrypt hash. Two earlier shortcuts were removed: a hard-coded list of
+        // demo credentials that granted admin (and created the account when it
+        // was missing), and a plain-text comparison fallback that made hashing
+        // pointless for any row stored unhashed.
+        $valid = $user
+            && is_string($user['password'] ?? null)
+            && password_verify($password, $user['password']);
 
         if (!$valid) {
+            // Identical response whether the email exists or not, so the endpoint
+            // cannot be used to enumerate registered accounts.
+            respond(['error' => 'Invalid credentials'], 401);
+        }
+
+        if (array_key_exists('activo', $user) && !$user['activo']) {
             respond(['error' => 'Invalid credentials'], 401);
         }
 
@@ -312,8 +339,7 @@ try {
             'nombre' => $user['nombre'],
             'rol' => $user['rol'],
         ];
-        $secret = getenv('JWT_SECRET') ?: 'tu_secret_key_super_seguro_para_jwt_produccion';
-        $token = JWT::encode($payload, $secret, 'HS256');
+        $token = JWT::encode($payload, jwt_secret(), 'HS256');
 
         $userData = [
             'id' => (int) $user['id'],
@@ -329,12 +355,26 @@ try {
         ]);
     }
 
+    // Everything past this line needs a valid token. Placing the guard once,
+    // here, means a route added later is protected by default instead of
+    // depending on whoever adds it remembering to call require_auth().
+    $claims = require_auth();
+
     if ($route === '/auth/logout' && $method === 'POST') {
         respond(['status' => 'ok']);
     }
 
     if ($route === '/auth/perfil' && $method === 'GET') {
-        respond(['user' => ['nombre' => 'Administrador', 'rol' => 'admin']]);
+        // Used to answer a hard-coded "Administrador" for every caller, which
+        // made the frontend show admin identity to any logged-in user.
+        respond([
+            'user' => [
+                'id' => $claims['user_id'] ?? null,
+                'nombre' => $claims['nombre'] ?? null,
+                'email' => $claims['email'] ?? null,
+                'rol' => $claims['rol'] ?? null,
+            ],
+        ]);
     }
 
     if ($route === '/productos' && $method === 'GET') {
@@ -448,6 +488,7 @@ try {
     }
 
     if ($route === '/usuarios' && $method === 'GET') {
+        require_admin();
         $created = date_column($pdo, 'usuarios');
         $activo = has_column($pdo, 'usuarios', 'activo') ? 'activo' : 'TRUE';
         $users = $pdo->query("SELECT id, nombre, email, rol, $activo AS activo, $created AS creado_en FROM usuarios ORDER BY id DESC")
@@ -456,6 +497,7 @@ try {
     }
 
     if ($route === '/usuarios' && $method === 'POST') {
+        require_admin();
         $input = body();
         $rol = ($input['rol'] ?? 'usuario') === 'admin' ? 'admin' : 'usuario';
         $id = insert_for_existing_columns($pdo, 'usuarios', [
@@ -469,6 +511,7 @@ try {
     }
 
     if (preg_match('#^/usuarios/(\d+)$#', $route, $matches) && $method === 'PUT') {
+        require_admin();
         $input = body();
         $values = [
             'nombre' => $input['nombre'] ?? null,
@@ -484,6 +527,7 @@ try {
     }
 
     if (preg_match('#^/usuarios/(\d+)$#', $route, $matches) && $method === 'DELETE') {
+        require_admin();
         if (has_column($pdo, 'usuarios', 'activo')) {
             $stmt = $pdo->prepare('UPDATE usuarios SET activo = FALSE WHERE id = ?');
         } else {
