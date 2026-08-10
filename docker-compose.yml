@@ -6,10 +6,10 @@ services:
     image: mysql:8.0
     container_name: inventario-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: inventario_db
       MYSQL_USER: inventario
-      MYSQL_PASSWORD: password123
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
     ports:
       - "3306:3306"
     volumes:
@@ -30,7 +30,7 @@ services:
     environment:
       PMA_HOST: mysql
       PMA_USER: inventario
-      PMA_PASSWORD: password123
+      PMA_PASSWORD: ${DB_PASSWORD:-password123}
       PMA_ROOT_PASSWORD: root
     ports:
       - "8081:80"
@@ -125,7 +125,7 @@ services:
       RECIPIENT_EMAIL: tu-correo@gmail.com
       DB_HOST: mysql
       DB_USER: inventario
-      DB_PASSWORD: password123
+      DB_PASSWORD: ${DB_PASSWORD:-password123}
       DB_NAME: inventario_db
       PORT: 3001
     ports:
