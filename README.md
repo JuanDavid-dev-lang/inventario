@@ -1,3 +1,8 @@
+> **Estado: en recuperación.** Este proyecto estuvo abandonado desde junio de 2026.
+> El historial fue purgado, se corrigieron fallas de autenticación graves y las
+> pruebas volvieron a correr. Antes de desplegarlo o publicarlo, leer
+> [`docs/ESTADO.md`](docs/ESTADO.md).
+
 
 # 🏪 InventarioPro v2.0 - React + Vite + Python + Docker
 
