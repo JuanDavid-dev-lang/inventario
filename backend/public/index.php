@@ -41,9 +41,10 @@ function apply_cors_headers(array $allowedOrigins): bool
         header_remove($header);
     }
 
-    if (!$hasOrigin) {
-        header('Access-Control-Allow-Origin: *', true);
-    } elseif ($originAllowed) {
+    // Sin cabecera Origin no hay peticion de origen cruzado que autorizar, asi
+    // que no se emite la cabecera. Responder '*' ahi no habilitaba nada nuevo,
+    // pero dejaba una politica permisiva escrita donde alguien podria copiarla.
+    if ($hasOrigin && $originAllowed) {
         header('Access-Control-Allow-Origin: ' . $requestOrigin, true);
     }
 

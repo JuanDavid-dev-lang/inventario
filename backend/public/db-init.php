@@ -63,11 +63,24 @@ try {
         }
     }
 
-    // Insertar usuario administrador por defecto
-    $admin_password = password_hash('admin123', PASSWORD_BCRYPT);
-    
+    // Usuario administrador inicial.
+    //
+    // La contrasena sale del entorno. Sembrar un literal significa que todas
+    // las instalaciones del sistema comparten la misma clave de admin, y basta
+    // con que una se publique para que el resto quede abierto.
+    $admin_email = getenv('ADMIN_EMAIL') ?: 'admin@inventario.com';
+    $admin_plain = getenv('ADMIN_PASSWORD') ?: '';
+
+    if (strlen($admin_plain) < 8) {
+        throw new RuntimeException(
+            'Definir ADMIN_PASSWORD (minimo 8 caracteres) antes de inicializar la base de datos.'
+        );
+    }
+
+    $admin_password = password_hash($admin_plain, PASSWORD_BCRYPT);
+
     $check_admin = $pdo->prepare("SELECT id FROM usuarios WHERE email = ?");
-    $check_admin->execute(['admin@inventario.com']);
+    $check_admin->execute([$admin_email]);
     
     if ($check_admin->rowCount() === 0) {
         $insert_admin = $pdo->prepare("
@@ -76,7 +89,7 @@ try {
         ");
         $insert_admin->execute([
             'Administrador',
-            'admin@inventario.com',
+            $admin_email,
             $admin_password,
             'admin',
             true

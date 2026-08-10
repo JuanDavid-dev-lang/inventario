@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS movimientos (
 
 -- Insert sample user
 INSERT IGNORE INTO usuarios (nombre, email, password, rol) 
--- bcrypt de 'admin123'. El backend solo acepta password_verify contra un
--- hash: sembrar la contrasena en texto plano dejaba al admin sin poder entrar.
--- CAMBIAR ESTA CONTRASENA EN EL PRIMER INICIO DE SESION.
-VALUES ('Admin', 'admin@inventario.com', '$2y$10$.NSIiMBfPczaSP26jCsv3.iKPqChQ6AYxc9ojGvkAw4WQj2dzE9Di', 'admin');
+-- El usuario administrador NO se siembra aqui.
+-- Lo crea backend/public/db-init.php tomando ADMIN_EMAIL y ADMIN_PASSWORD
+-- del entorno, para que cada instalacion tenga su propia clave en vez de
+-- compartir una escrita en el repositorio.
 
 -- Insert sample products
 INSERT IGNORE INTO productos (nombre, descripcion, precio, cantidad, stock_minimo, categoria)

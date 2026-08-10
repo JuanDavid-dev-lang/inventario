@@ -78,11 +78,15 @@ De **23.690 archivos y 37 MB** a **100 archivos y 694 KB**, conservando los 55 c
 ## Lo que falta
 
 - [ ] **Rotar las credenciales.** Bloqueante, arriba.
-- [ ] **Un solo esquema de base de datos.** Quedan dos que difieren: `init.sql` (lo usa `docker-compose`) y `backend/migrations/001_init_schema.sql`. Consolidarlos requiere levantar la base y comparar, que no se hizo.
+- [ ] **Un solo esquema de base de datos.** Siguen `init.sql` (lo usa `docker-compose`) y `backend/migrations/001_init_schema.sql`, que difieren en detalles de columnas. Ninguno siembra ya credenciales, así que dejó de ser un problema de seguridad, pero sigue siendo dos fuentes de verdad. Consolidarlos requiere levantar MySQL y comparar el resultado, que no se hizo por no tener Docker disponible en la máquina donde se trabajó.
 - [ ] **Los 3 tests de frontend omitidos.** El de `api.js` necesita que la URL base salga de `import.meta.env` a un módulo que Jest pueda leer. El de login se arregla subiendo a Jest 30. El de reportes está escrito contra una interfaz que ya no existe y hay que reescribirlo.
-- [ ] **Sin pruebas del backend PHP.** Existe `tests/unit/backend/test_api.php` pero no hay PHPUnit configurado corriendo. Es el hueco más grande: la capa que se acaba de arreglar es la única sin pruebas que lo verifiquen.
-- [ ] **El seed crea el admin con `admin123`.** Debería leer la contraseña de una variable de entorno y negarse a usar un valor por defecto.
-- [ ] **CORS acepta cualquier origen cuando no hay cabecera `Origin`.** Revisar si eso es intencional.
+- [ ] **Sin pruebas del backend PHP. Este es el hueco más grande.** Existe `tests/unit/backend/test_api.php` pero no hay PHPUnit corriendo. La capa de autenticación —la que más cambió— es la única sin pruebas que la verifiquen.
+
+  No se hizo porque en la máquina donde se trabajó no hay PHP instalado, y escribir una suite que no se puede ejecutar ni una vez antes de subirla es cómo se llega a un CI en rojo. El CI actual compensa parcialmente: verifica sintaxis de toda la API y **falla si alguien reintroduce** el secreto fijo, las credenciales de demo o la comparación en texto plano.
+
+  Para hacerlo hace falta: instalar PHP 8.2 y Composer, extraer `require_auth`, `require_admin` y `jwt_secret` de `index.php` a una clase con autoload, y escribir pruebas de: token ausente, token firmado con otro secreto, token expirado, `alg: none`, rol insuficiente en las rutas de `/usuarios`, y login con contraseña correcta contra hash bcrypt.
+- [x] ~~El seed crea el admin con `admin123`~~ — ahora sale de `ADMIN_PASSWORD` y la inicialización falla si no está definida. `init.sql` ya no siembra credenciales.
+- [x] ~~CORS responde `*` sin cabecera `Origin`~~ — ya no emite la cabecera en ese caso.
 - [ ] **Documentación desactualizada.** Los 10 archivos movidos a `docs/` describen el proyecto antes de estos cambios.
 
 ---
