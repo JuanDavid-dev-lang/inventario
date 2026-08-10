@@ -48,8 +48,13 @@ services:
     environment:
       DB_HOST: mysql
       DB_USER: inventario
-      DB_PASSWORD: password123
+      DB_PASSWORD: ${DB_PASSWORD:-password123}
       DB_NAME: inventario_db
+      # Required: the API refuses to issue tokens without it. Generate one per
+      # installation with `openssl rand -hex 32` and put it in .env — two shops
+      # sharing a secret means a token minted at one is valid at the other.
+      JWT_SECRET: ${JWT_SECRET:?define JWT_SECRET en .env}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:5173}
     ports:
       - "8000:80"
     volumes:

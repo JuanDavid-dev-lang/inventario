@@ -6,16 +6,31 @@ Fecha de la intervención: 2026-08-09. Último commit propio del proyecto: 2026-
 
 ---
 
+## Cambio de rumbo: instalación local, no nube
+
+El proyecto nació apuntando a Cloud Run y Cloud SQL. **Ese despliegue ya no
+existe**: ambos servicios responden 500. La dirección ahora es una instalación
+local por empresa, con `docker compose`, que para una pyme significa sin
+mensualidad y con los datos dentro del negocio.
+
+Lo que cambió por eso:
+
+- `docker/nginx.conf` proxyaba a una URL de Cloud Run muerta; ahora apunta al contenedor `backend`
+- `frontend/src/services/api.js` apuntaba a esa misma API; ahora usa `/api` del mismo origen, así que una instalación local no necesita configuración
+- La lista blanca de CORS nombraba el host de Cloud Run; ahora se define por variable de entorno
+- `docker-compose.yml` ahora exige `JWT_SECRET` y parametriza `DB_PASSWORD`
+- Eliminados `cloudbuild*.yaml`, `deploy.sh`, `deploy.bat`, `.gcloudignore`, `Procfile` y los Dockerfile de Cloud Run
+
 ## ⛔ Bloqueante antes de publicar o desplegar
 
 **Rotar dos credenciales.** Estuvieron escritas en el repositorio (`notification-service/.env`, ahora purgado del historial):
 
 1. **Contraseña de aplicación de Gmail** → revocar en https://myaccount.google.com/apppasswords
-2. **Contraseña de la base de datos** → cambiar donde esté corriendo (Cloud SQL)
+2. **Instancia de Cloud SQL** → borrarla desde la consola de GCP. Como el proyecto pasa a ser local, esa base ya no se usa; borrarla detiene el cobro mensual y hace desaparecer la contraseña filtrada junto con ella.
 
 El repositorio siempre fue privado, así que nunca estuvieron expuestas públicamente. Pero mientras sigan siendo válidas, cualquier copia vieja del repositorio las contiene. Rotarlas convierte lo que quedó escrito en texto sin valor.
 
-**Y una tercera, si el despliegue actual sigue en pie:** cualquier token JWT emitido antes de este arreglo se firmó con un secreto que estaba escrito en el código. Definir `JWT_SECRET` con un valor nuevo de al menos 32 caracteres invalida todos esos tokens.
+Los tokens JWT emitidos antes de este arreglo se firmaron con un secreto que estaba escrito en el código. Cada instalación local debe generar el suyo (`openssl rand -hex 32`) en su propio `.env`.
 
 ---
 

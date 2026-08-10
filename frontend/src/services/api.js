@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 // URL del backend en Cloud Run
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://inventario-api-208277945925.southamerica-east1.run.app'
+// Same-origin by default: nginx proxies /api to the backend container, so a
+// local install needs no configuration at all.
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,

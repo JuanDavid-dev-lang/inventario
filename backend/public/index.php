@@ -7,7 +7,6 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 $defaultAllowedOrigins = [
-    'https://inventario-frontend-208277945925.southamerica-east1.run.app',
     'http://localhost:5173',
     'http://localhost:3000',
     'http://localhost:8080',
@@ -31,7 +30,7 @@ function apply_cors_headers(array $allowedOrigins): bool
     $originAllowed = !$hasOrigin
         || in_array('*', $allowedOrigins, true)
         || in_array($requestOrigin, $allowedOrigins, true)
-        || (bool) preg_match('#^https://inventario-frontend-[a-z0-9-]+\.southamerica-east1\.run\.app$#i', $requestOrigin);
+        ;
 
     foreach ([
         'Access-Control-Allow-Origin',
