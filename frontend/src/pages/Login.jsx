@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Boxes } from 'lucide-react'
 
 const Login = () => {
   const navigate = useNavigate()
@@ -32,136 +32,68 @@ const Login = () => {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      height: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    }}>
-      {/* Left side - Branding */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: 'white'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: '3rem', fontWeight: '700', marginBottom: '1rem' }}>
-            📦 InventarioPro
-          </h1>
-          <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>
-            Sistema de Gestión de Inventario
-          </p>
-          <p style={{ fontSize: '1rem', opacity: 0.7, marginTop: '0.5rem' }}>
-            Predicción con IA | Reportes Avanzados
-          </p>
+    <div className="login-shell">
+      <div className="login-card">
+        <div className="login-head">
+          <span className="brand-mark" aria-hidden="true">
+            <Boxes size={16} />
+          </span>
+          <div>
+            <h1>InventarioPro</h1>
+            <p className="login-sub">Control de inventario y demanda</p>
+          </div>
         </div>
-      </div>
 
-      {/* Right side - Login Form */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'white',
-        padding: '2rem'
-      }}>
-        <div style={{ width: '100%', maxWidth: '400px' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem' }}>
-            Iniciar Sesión
-          </h2>
+        {(error || authError) && (
+          <div className="alert alert-error" role="alert">
+            <AlertCircle size={16} aria-hidden="true" />
+            <span>{error || authError}</span>
+          </div>
+        )}
 
-          {(error || authError) && (
-            <div style={{
-              display: 'flex',
-              gap: '0.75rem',
-              padding: '1rem',
-              borderRadius: '8px',
-              backgroundColor: '#fee2e2',
-              color: '#991b1b',
-              marginBottom: '1.5rem',
-              border: '1px solid #fca5a5'
-            }}>
-              <AlertCircle size={20} style={{ flexShrink: 0 }} />
-              <span>{error || authError}</span>
-            </div>
-          )}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">Correo</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="usuario@negocio.com"
+              autoComplete="username"
+              required
+            />
+          </div>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                Email
-              </label>
+          <div className="form-group">
+            <label htmlFor="password">Contraseña</label>
+            <div className="input-affix">
               <input
-                type="email"
-                name="email"
-                value={formData.email}
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
-                placeholder="usuario@ejemplo.com"
+                placeholder="••••••••"
+                autoComplete="current-password"
                 required
-                disabled={loading}
               />
+              <button
+                type="button"
+                className="affix-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
+          </div>
 
-            <div style={{ marginBottom: '2rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                Contraseña
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Ingrese su contraseña"
-                  required
-                  disabled={loading}
-                  style={{ paddingRight: '3rem' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: '0.75rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#64748b'
-                  }}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary"
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                fontWeight: '600',
-                padding: '0.75rem',
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {loading ? '🔄 Iniciando...' : '🔓 Iniciar Sesión'}
-            </button>
-          </form>
-
-          <hr style={{ margin: '2rem 0', borderColor: '#e2e8f0' }} />
-
-          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>
-            Demo: <strong>admin@inventario.com</strong> / <strong>admin123</strong>
-          </p>
-        </div>
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+            {loading ? 'Entrando…' : 'Entrar'}
+          </button>
+        </form>
       </div>
     </div>
   )

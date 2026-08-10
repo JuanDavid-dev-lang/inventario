@@ -2,10 +2,18 @@ import React, { useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
-  Menu, X, LogOut, LayoutGrid, Package, Move, BarChart3,
-  Brain, Users, Home
+  Menu, X, LogOut, Package, Move, BarChart3,
+  Brain, Users, Home, Boxes
 } from 'lucide-react'
 
+/**
+ * Presentation lives in global.css, not in style props.
+ *
+ * Every rule here used to be an inline object, which meant a colour could only
+ * be changed by editing JSX in several places and none of it could respond to
+ * a media query or a :hover without a JS handler. Classes let the whole app be
+ * restyled from one file.
+ */
 const Layout = () => {
   const { usuario, logout } = useAuth()
   const location = useLocation()
@@ -16,7 +24,7 @@ const Layout = () => {
     { path: '/productos', label: 'Productos', icon: Package },
     { path: '/movimientos', label: 'Movimientos', icon: Move },
     { path: '/reportes', label: 'Reportes', icon: BarChart3 },
-    { path: '/prediccion', label: 'Predicción IA', icon: Brain }
+    { path: '/prediccion', label: 'Predicción', icon: Brain }
   ]
 
   if (usuario?.rol === 'admin') {
@@ -32,100 +40,65 @@ const Layout = () => {
 
   return (
     <div className="main-layout">
-      {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? '' : 'hidden'}`} style={{ transition: 'all 0.3s ease' }}>
-        <div style={{ padding: '2rem 1rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#4f86f7', marginBottom: '2rem' }}>
-            📦 InventarioPro
-          </h1>
+      <aside className={`sidebar ${sidebarOpen ? '' : 'hidden'}`}>
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">
+            <Boxes size={16} />
+          </span>
+          InventarioPro
+        </div>
 
-          <nav>
-            {menuItems.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    marginBottom: '0.5rem',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    color: isActive(item.path) ? '#4f86f7' : '#64748b',
-                    backgroundColor: isActive(item.path) ? '#f0f4ff' : 'transparent',
-                    fontWeight: isActive(item.path) ? '600' : '500',
-                    transition: 'all 0.3s ease',
-                    borderLeft: isActive(item.path) ? '4px solid #4f86f7' : '4px solid transparent',
-                    borderRadius: '0 8px 8px 0'
-                  }}
-                >
-                  <Icon size={20} />
-                  <span>{item.label}</span>
-                </Link>
-              )
-            })}
-          </nav>
+        <nav className="sidebar-nav" aria-label="Secciones">
+          {menuItems.map((item) => {
+            const Icon = item.icon
+            const active = isActive(item.path)
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`nav-link ${active ? 'is-active' : ''}`}
+                // Marks the current page for screen readers too, instead of
+                // signalling it with colour alone.
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon size={17} aria-hidden="true" />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
-          <hr style={{ margin: '2rem 0', borderColor: '#e2e8f0' }} />
-
-          <button
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              width: '100%',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              color: '#dc2626',
-              backgroundColor: '#fee2e2',
-              fontWeight: '600',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#fca5a5'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#fee2e2'}
-          >
-            <LogOut size={20} />
+        <div className="sidebar-foot">
+          <button type="button" className="logout-btn" onClick={handleLogout}>
+            <LogOut size={17} aria-hidden="true" />
             <span>Cerrar sesión</span>
           </button>
         </div>
-      </div>
+      </aside>
 
-      {/* Main Content */}
       <div className="content">
-        {/* Navbar */}
-        <div className="navbar">
+        <header className="navbar">
           <button
+            type="button"
+            className="icon-btn"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '0.5rem'
-            }}
+            aria-label={sidebarOpen ? 'Ocultar menú' : 'Mostrar menú'}
+            aria-expanded={sidebarOpen}
           >
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            {sidebarOpen ? <X size={17} /> : <Menu size={17} />}
           </button>
 
-          <h2>InventarioPro v2.0</h2>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ color: '#64748b' }}>👤 {usuario?.nombre}</span>
-            <span style={{ fontSize: '0.8rem', padding: '0.25rem 0.75rem', backgroundColor: '#f0f4ff', borderRadius: '20px', color: '#4f86f7' }}>
+          <div className="navbar-user">
+            <strong>{usuario?.nombre}</strong>
+            <span className="role-chip">
               {usuario?.rol === 'admin' ? 'Admin' : 'Empleado'}
             </span>
           </div>
-        </div>
+        </header>
 
-        {/* Content Area */}
-        <div className="main-content">
+        <main className="main-content">
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   )
