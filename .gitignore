@@ -75,3 +75,7 @@ frontend/.vite-cache/
 
 # Backend
 backend/vendor/
+
+# Local scratch
+.local/
+salida/

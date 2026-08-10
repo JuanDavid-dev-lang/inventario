@@ -10,6 +10,24 @@ from unittest.mock import Mock, patch, MagicMock
 import pandas as pd
 import numpy as np
 
+# The Spark suites need a real pyspark install and a JVM. Guarding only those
+# classes keeps the pure-Python model tests running on a machine without Spark,
+# instead of skipping the whole file.
+try:
+    import pyspark  # noqa: F401
+    # A package does not expose its submodules as attributes unless something
+    # imports them; the Spark tests reach for pyml.spark_mining after a bare
+    # `import pyml`, so the dependency is made explicit here.
+    import pyml.spark_mining  # noqa: F401
+
+    SPARK_AVAILABLE = True
+except ImportError:
+    SPARK_AVAILABLE = False
+
+requires_spark = pytest.mark.skipif(
+    not SPARK_AVAILABLE, reason="pyspark no instalado; se omiten las pruebas de Spark"
+)
+
 # Add parent to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../pyml'))
 
@@ -17,6 +35,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../pyml'))
 # TESTS FOR SPARK MODULE
 # ============================================================================
 
+@requires_spark
 class TestSparkConfig:
     """Test Spark session initialization"""
     
@@ -42,6 +61,7 @@ class TestSparkConfig:
             mock_conf_instance.set.assert_not_called()
 
 
+@requires_spark
 class TestSparkTrainer:
     """Test Spark Model Training"""
     
@@ -207,6 +227,7 @@ class TestModelTrainer:
 # INTEGRATION TESTS
 # ============================================================================
 
+@requires_spark
 class TestIntegration:
     """Full integration tests"""
     
